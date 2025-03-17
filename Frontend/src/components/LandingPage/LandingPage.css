@@ -1,0 +1,23 @@
+.landing-page {
+    display: flex;
+    flex-direction: column;
+    height: 200vh; 
+  }
+  
+  .content {
+    flex: 1; 
+    min-height: 0; 
+  }
+  
+
+  @media (max-width: 768px) {
+    .content {
+      flex: 1;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .content {
+      flex: 1;
+    }
+  }
