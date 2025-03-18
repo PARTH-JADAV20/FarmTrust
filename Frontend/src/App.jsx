@@ -3,6 +3,8 @@ import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage/LandingPage';
 import Footer from './components/Footer';
 import ProductList from './components/Product/ProductList';
+import SingleProduct from './components/SingleProduct/SIngleProduct';
+
 
 function App() {
   return (
@@ -11,6 +13,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/products" element={<ProductList />} />
+        <Route path='/product' element={<SingleProduct />} />
+       
       </Routes>
       <Footer />
     </Router>
