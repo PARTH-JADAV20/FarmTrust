@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const farmerSchema = new mongoose.Schema({
-  _id: { type: String, default: () => new ObjectId().toString() }, 
+  _id: { type: String, default: () => new ObjectId().toString() },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   phone: { type: String, default: '' },
@@ -26,7 +26,8 @@ const farmerSchema = new mongoose.Schema({
     id: { type: String, default: () => new ObjectId().toString() },
     name: { type: String, required: true },
     mrpPerKg: { type: Number, required: true },
-    images: { type: [String], default: [] }, 
+    images: { type: [String], default: [] },
+    description: { type: String, default: '' },
     category: { type: String, enum: ['fruits', 'vegetables'], required: true },
     subcategory: { type: String, required: true },
     stockInKg: { type: Number, required: true },
@@ -41,7 +42,6 @@ const farmerSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 }, { _id: false });
 
-// Pre-save hook to calculate farmerRating
 farmerSchema.pre('save', function(next) {
   if (this.products.length > 0) {
     const totalProductAverage = this.products.reduce((sum, product) => {
