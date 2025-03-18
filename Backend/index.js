@@ -30,7 +30,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-console.log('Cloudinary Config:', cloudinary.config()); // Debug Cloudinary setup
 
 app.use(cors());
 app.use(express.json());
@@ -53,7 +52,6 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit per file
 });
 
-// POST /farmers (unchanged)
 app.post('/farmers', async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -81,7 +79,7 @@ app.post('/farmers', async (req, res) => {
   }
 });
 
-// PATCH /farmers/:id (with fixes and logging)
+
 app.patch('/farmers/:id', upload.fields([
   { name: 'productImages', maxCount: 4 },
   { name: 'fssaiCert', maxCount: 1 },
@@ -91,8 +89,8 @@ app.patch('/farmers/:id', upload.fields([
     const { id } = req.params;
     const { phone, address, description, deliveryCharge, products } = req.body;
 
-    console.log('Request body:', req.body); // Debug incoming data
-    console.log('Uploaded files:', req.files); // Debug uploaded files
+    console.log('Request body:', req.body); 
+    console.log('Uploaded files:', req.files); 
 
     const farmer = await Farmer.findById(id);
     if (!farmer) {
@@ -108,7 +106,7 @@ app.patch('/farmers/:id', upload.fields([
     const productImages = [];
     if (req.files['productImages']) {
       for (const file of req.files['productImages']) {
-        console.log('Uploading file:', file.originalname, file.mimetype, file.buffer.length); // Debug file details
+        console.log('Uploading file:', file.originalname, file.mimetype, file.buffer.length); 
         const result = await new Promise((resolve, reject) => {
           cloudinary.uploader.upload_stream(
             { folder: 'farmers/products', resource_type: 'image' },
@@ -117,7 +115,7 @@ app.patch('/farmers/:id', upload.fields([
                 console.error('Cloudinary upload error:', error);
                 reject(error);
               } else {
-                console.log('Upload result:', result); // Debug upload result
+                console.log('Upload result:', result); 
                 resolve(result);
               }
             }
@@ -156,7 +154,7 @@ app.patch('/farmers/:id', upload.fields([
           {
             folder: 'farmers/certificates',
             resource_type: 'raw',
-            public_id: `${Date.now()}-${organicFile.originalname}` // Unique public_id
+            public_id: `${Date.now()}-${organicFile.originalname}`
           },
           (error, result) => {
             if (error) reject(error);
@@ -178,7 +176,7 @@ app.patch('/farmers/:id', upload.fields([
           id: productId,
           name: product.name,
           mrpPerKg: product.mrpPerKg,
-          images: productImages.length ? productImages : [], // Assign all images to each product
+          images: productImages.length ? productImages : [], 
           category: product.category,
           subcategory: product.subcategory,
           stockInKg: product.stockInKg,
@@ -200,7 +198,7 @@ app.patch('/farmers/:id', upload.fields([
   }
 });
 
-// GET /farmers/:email (unchanged)
+
 app.get('/farmers/:email', async (req, res) => {
   try {
     const { email } = req.params;
@@ -220,7 +218,7 @@ app.get('/farmers/:email', async (req, res) => {
   }
 });
 
-// DELETE /farmers/:id/products/:productId (unchanged)
+
 app.delete('/farmers/:id/products/:productId', async (req, res) => {
   try {
     const { id, productId } = req.params;
@@ -248,7 +246,6 @@ app.delete('/farmers/:id/products/:productId', async (req, res) => {
   }
 });
 
-// User endpoints (unchanged)
 app.post('/users', async (req, res) => {
   try {
     const { name, email, password, googleId, phone, address } = req.body;

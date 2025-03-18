@@ -18,15 +18,15 @@ const farmerSchema = new mongoose.Schema({
   description: { type: String, default: '' },
   isVerified: { type: Boolean, default: false },
   certificates: {
-    fssai: { type: String, default: '' }, // URL to PDF on Cloudinary
-    organicFarm: { type: String, default: '' } // URL to PDF on Cloudinary
+    fssai: { type: String, default: '' }, 
+    organicFarm: { type: String, default: '' } 
   },
   deliveryCharge: { type: Number, default: 0 },
   products: [{
     id: { type: String, default: () => new ObjectId().toString() },
     name: { type: String, required: true },
     mrpPerKg: { type: Number, required: true },
-    images: { type: [String], default: [] }, // Array of Cloudinary URLs
+    images: { type: [String], default: [] }, 
     category: { type: String, enum: ['fruits', 'vegetables'], required: true },
     subcategory: { type: String, required: true },
     stockInKg: { type: Number, required: true },
