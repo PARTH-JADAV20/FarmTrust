@@ -3,7 +3,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 30px;
-    background: linear-gradient(90deg, #ffffff, #f8f9fa); /* Subtle gradient for depth */
+    background: linear-gradient(90deg, #ffffff, #f8f9fa);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Softer shadow */
     font-family: 'Poppins', sans-serif;
     position: sticky;
