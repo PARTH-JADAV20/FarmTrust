@@ -11,6 +11,7 @@ import priyaSingh from '../../assets/priya-singh.jpg'; // Farmer image 2 (used f
 import amitPatel from '../../assets/amit-patel.jpg'; // Farmer image 3 (used for testimonial 3)
 import { FaUserPlus, FaCheck, FaStore, FaSearch, FaQrcode, FaShoppingCart, FaCertificate, FaStar } from 'react-icons/fa'; // Import required icons
 import { MdVerifiedUser } from "react-icons/md";
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   return (
@@ -67,28 +68,36 @@ const LandingPage = () => {
           <h2 className="section-title">Featured Products</h2>
           <div className="products">
             <div className="product-card">
-              <img src={organicVegetables} alt="Organic Vegetables" className="product-image" />
-              <h3 className="product-title">Organic Vegetables</h3>
-              <p className="product-price">₹199/kg</p>
-              <button className="view-details-button">View Details</button>
+              <Link to='/products'>
+                <img src={organicVegetables} alt="Organic Vegetables" className="product-image" />
+                <h3 className="product-title">Organic Vegetables</h3>
+                <p className="product-price">₹199/kg</p>
+                <button className="view-details-button" >View Details</button>
+              </Link>
             </div>
             <div className="product-card">
+            <Link to='/products'>
               <img src={freshFruits} alt="Fresh Fruits" className="product-image" />
               <h3 className="product-title">Fresh Fruits</h3>
               <p className="product-price">₹149/kg</p>
               <button className="view-details-button">View Details</button>
+              </Link>
             </div>
             <div className="product-card">
+            <Link to='/products'>
               <img src={pureHoney} alt="Pure Honey" className="product-image" />
               <h3 className="product-title">Pure Honey</h3>
               <p className="product-price">₹399/500g</p>
               <button className="view-details-button">View Details</button>
+              </Link>
             </div>
             <div className="product-card">
+            <Link to='/products'>
               <img src={organicGrains} alt="Organic Grains" className="product-image" />
               <h3 className="product-title">Organic Grains</h3>
               <p className="product-price">₹299/kg</p>
               <button className="view-details-button">View Details</button>
+              </Link>
             </div>
           </div>
         </div>
