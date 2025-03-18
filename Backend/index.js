@@ -79,7 +79,6 @@ app.post('/farmers', async (req, res) => {
   }
 });
 
-
 app.patch('/farmers/:id', upload.fields([
   { name: 'productImages', maxCount: 4 },
   { name: 'fssaiCert', maxCount: 1 },
@@ -166,7 +165,6 @@ app.patch('/farmers/:id', upload.fields([
       console.log('Organic URL:', organicResult.secure_url);
     }
 
-    // Append new products with all uploaded images
     if (products) {
       const parsedProducts = JSON.parse(products);
       const newProducts = parsedProducts.map(product => {
@@ -177,6 +175,7 @@ app.patch('/farmers/:id', upload.fields([
           name: product.name,
           mrpPerKg: product.mrpPerKg,
           images: productImages.length ? productImages : [], 
+          description: product.description || '', 
           category: product.category,
           subcategory: product.subcategory,
           stockInKg: product.stockInKg,
@@ -198,7 +197,6 @@ app.patch('/farmers/:id', upload.fields([
   }
 });
 
-
 app.get('/farmers/:email', async (req, res) => {
   try {
     const { email } = req.params;
@@ -217,7 +215,6 @@ app.get('/farmers/:email', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 
 app.delete('/farmers/:id/products/:productId', async (req, res) => {
   try {
@@ -248,7 +245,7 @@ app.delete('/farmers/:id/products/:productId', async (req, res) => {
 
 app.post('/users', async (req, res) => {
   try {
-    const { name, email, password, googleId, phone, address } = req.body;
+    const { name, email, googleId, phone, address, role } = req.body; 
 
     if (!name || !email) {
       return res.status(400).json({ message: 'Name and email are required' });
@@ -264,7 +261,8 @@ app.post('/users', async (req, res) => {
       name,
       email,
       phone: phone || '',
-      address: address || { street: '', city: '', state: '', zipCode: '' }
+      address: address || { street: '', city: '', state: '', zipCode: '' },
+      role: role || 'customer' 
     };
 
     const user = new User(userData);
@@ -283,7 +281,7 @@ app.post('/users', async (req, res) => {
 app.patch('/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password, googleId, phone, address, cart, orders } = req.body;
+    const { name, email, googleId, phone, address, cart, orders, role } = req.body; 
 
     const user = await User.findById(id);
     if (!user) {
@@ -300,6 +298,7 @@ app.patch('/users/:id', async (req, res) => {
     }
     if (phone) user.phone = phone;
     if (address) user.address = JSON.parse(address);
+    if (role) user.role = role; 
 
     if (cart) {
       const parsedCart = JSON.parse(cart);

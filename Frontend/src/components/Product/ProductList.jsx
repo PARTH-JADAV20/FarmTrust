@@ -128,17 +128,17 @@ const ProductList = () => {
 
   const ProductCard = ({ product }) => {
     return (
-      <div className="product-card">
-        <div className="product-image">
+      <div className="product-card2">
+        <div className="product-image2">
           <img src={product.image} alt={product.name} />
         </div>
-        <h3 className="product-name">{product.name}</h3>
-        <div className="product-rating">
+        <h3 className="product-name2">{product.name}</h3>
+        <div className="product-rating2">
           <RatingStars rating={product.rating} />
-          <span className="review-count">({product.reviews} reviews)</span>
+          <span className="review-count2">({product.reviews} reviews)</span>
         </div>
-        <div className="product-footer">
-          <div className="product-price">₹{product.price}/kg</div>
+        <div className="product-footer2">
+          <div className="item-price">₹{product.price}/kg</div>
           <button className="add-to-cart-btn">Add to Cart</button>
         </div>
       </div>
@@ -150,58 +150,60 @@ const ProductList = () => {
       <div className="explore-section">
         <h1>Explore Natural Products</h1>
         <div className="categories">
-          <button 
-            className={selectedCategory === 'All' ? 'active' : ''} 
+          <button
+            className={selectedCategory === 'All' ? 'active' : ''}
             onClick={() => handleCategoryChange('All')}
           >
             All
           </button>
-          <button 
-            className={selectedCategory === 'Vegetables' ? 'active' : ''} 
+          <button
+            className={selectedCategory === 'Vegetables' ? 'active' : ''}
             onClick={() => handleCategoryChange('Vegetables')}
           >
             Vegetables
           </button>
-          <button 
-            className={selectedCategory === 'Fruits' ? 'active' : ''} 
+          <button
+            className={selectedCategory === 'Fruits' ? 'active' : ''}
             onClick={() => handleCategoryChange('Fruits')}
           >
             Fruits
           </button>
-          <button 
-            className={selectedCategory === 'Grains' ? 'active' : ''} 
+          <button
+            className={selectedCategory === 'Grains' ? 'active' : ''}
             onClick={() => handleCategoryChange('Grains')}
           >
             Grains
           </button>
-          <button 
-            className={selectedCategory === 'Dairy' ? 'active' : ''} 
+          <button
+            className={selectedCategory === 'Dairy' ? 'active' : ''}
             onClick={() => handleCategoryChange('Dairy')}
           >
             Dairy
           </button>
         </div>
-        <div className="price-range">
-          <span className='price-span'>Price Range</span>
-          <span className='pricerange'>₹0 - ₹{maxPrice}</span>
-          <input
-            type="range"
-            min="0"
-            max="1000"
-            value={maxPrice}
-            onChange={handleMaxPriceChange}
-          />
-        </div>
-        <div className="sort-by">
-          <span>Sort by:</span>
-          <select value={sortOrder} onChange={handleSortChange}>
-            <option value="newest">Newest</option>
-            <option value="priceLowToHigh">Price: Low to High</option>
-            <option value="priceHighToLow">Price: High to Low</option>
-          </select>
+        <div className='price-sort'>
+          <div className="price-range">
+            <span className='price-span'>Price Range</span>
+            <span className='pricerange'>₹0 - ₹{maxPrice}</span>
+            <input
+              type="range"
+              min="0"
+              max="1000"
+              value={maxPrice}
+              onChange={handleMaxPriceChange}
+            />
+          </div>
+          <div className="sort-by">
+            <span>Sort by:</span>
+            <select value={sortOrder} onChange={handleSortChange}>
+              <option value="newest">Newest</option>
+              <option value="priceLowToHigh">Price: Low to High</option>
+              <option value="priceHighToLow">Price: High to Low</option>
+            </select>
+          </div>
         </div>
       </div>
-      
+
       <div className="products-layout">
         {sortedProducts.map((product) => (
           <ProductCard key={product.id} product={product} />

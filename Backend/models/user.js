@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const { ObjectId } = mongoose.Types;
 
 const userSchema = new mongoose.Schema({
-  _id: { type: String, default: () => new ObjectId().toString() }, 
+  _id: { type: String, default: () => new ObjectId().toString() },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   phone: { type: String, default: '' },
@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     state: { type: String, default: '' },
     zipCode: { type: String, default: '' }
   },
+  role: { type: String, default: 'customer' },
   cart: [{
     farmerId: { type: String, required: true },
     productId: { type: String, required: true },

@@ -2,11 +2,13 @@
 import React from 'react';
 import './Navbar.css'; // Import the external CSS
 import { FaSearch, FaBell, FaEnvelope } from 'react-icons/fa'; // Importing icons from react-icons
+import { FaLeaf } from "react-icons/fa6";
 
 const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
+        <FaLeaf className='leaf-logo'/>
         <h1>FarmTrust</h1>
       </div>
       <div className="navbar-right">
