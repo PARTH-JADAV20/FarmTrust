@@ -1,0 +1,575 @@
+/* ProductPage.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .product-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Main Product Section */
+  .product-main-section {
+    display: flex;
+    margin-bottom: 40px;
+    gap: 20px;
+  }
+  
+  /* Image Section */
+  .product-image-section {
+    width: 50%;
+  }
+  
+  .main-image-container {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  
+  .main-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+  
+  .main-image:hover {
+    transform: scale(1.05);
+  }
+  
+  .thumbnails-container {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .thumbnail {
+    width: 150px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .thumbnail:hover {
+    transform: translateY(-3px);
+  }
+  
+  .thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .active-thumbnail {
+    border-color: #00a651;
+  }
+  
+  /* Product Info Section */
+  .product-info-section {
+    width: 50%;
+    padding: 10px;
+  }
+  
+  .product-title {
+
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .product-description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  
+  .product-price {
+    font-size: 28px;
+    font-weight: 700;
+    color: #00a651;
+    margin-bottom: 20px;
+  }
+  
+  /* Seller Info */
+  .seller-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 15px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .seller-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 10px;
+  }
+  
+  .seller-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .seller-details {
+    flex: 1;
+  }
+  
+  .seller-name {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .verified-icon {
+    color: #00a651;
+    font-size: 14px;
+    background-color: #e6f7ef;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .seller-title {
+    font-size: 13px;
+    color: #666;
+  }
+  
+  .seller-profile-link a {
+    font-size: 12px;
+    color: #00a651;
+    text-decoration: none;
+  }
+  
+  .seller-profile-link a:hover {
+    text-decoration: underline;
+  }
+  
+  .seller-delivery {
+    font-size: 13px;
+    color: #666;
+    margin-right: 15px;
+  }
+  
+  .report-button button {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .report-button button:hover {
+    color: #ff7875;
+    text-decoration: underline;
+  }
+  
+  /* Product Actions */
+  .product-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .buy-now-button, .add-to-cart-button {
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .buy-now-button {
+    background-color: #00a651;
+    color: white;
+    border: none;
+    flex: 1;
+  }
+  
+  .buy-now-button:hover {
+    background-color: #008c44;
+  }
+  
+  .add-to-cart-button {
+    background-color: white;
+    color: #00a651;
+    border: 1px solid #00a651;
+    flex: 1;
+  }
+  
+  .add-to-cart-button:hover {
+    background-color: #f6fffa;
+  }
+  
+  /* Related Products Section */
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .related-products-container {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+  }
+  
+  .related-product-card {
+    min-width: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .related-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .related-product-image {
+    height: 250px;
+    overflow: hidden;
+  }
+  
+  .related-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .related-product-info {
+    padding: 10px;
+  }
+  
+  .related-product-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  .related-product-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #00a651;
+  }
+  
+  /* Customer Reviews Section */
+  .customer-reviews-section {
+    margin-top: 40px;
+  }
+  
+  .write-review-container {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .write-review-header {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  
+  .rating-stars {
+    margin-bottom: 15px;
+  }
+  
+  .star {
+    font-size: 24px;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .star:hover, .star.filled {
+    color: #ffce3d;
+  }
+  
+  .review-input {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    resize: none;
+  }
+  
+  .submit-review-button {
+    background-color: #00a651;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-review-button:hover {
+    background-color: #008c44;
+  }
+  
+  /* Reviews List */
+  .review-card {
+    display: flex;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .reviewer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+  }
+  
+  .reviewer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .review-content {
+    flex: 1;
+  }
+  
+  .reviewer-name {
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  
+  .review-rating {
+    margin-bottom: 10px;
+  }
+  
+  .review-text {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .product-main-section {
+      flex-direction: column;
+    }
+    
+    .product-image-section, .product-info-section {
+      width: 100%;
+    }
+    
+    .product-price {
+      font-size: 24px;
+    }
+    
+    .product-actions {
+      flex-direction: column;
+    }
+  }
+
+  /* Farmer Card Styles */
+  .farmer-d {
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    flex-wrap: wrap; /* Add this for better mobile responsiveness */
+  }
+  
+  .farmer-info {
+    display: flex;
+    align-items: center;
+    flex: 1; /* This allows the info section to take available space */
+    margin-bottom: 10px; /* Spacing when it wraps */
+  }
+  
+  .farmer-actions {
+    display: flex;
+    margin-bottom: 8%;
+    align-items: center; /* Uncomment this */
+    gap: 15px; /* Better spacing between actions */
+  }
+
+  .file-icon-fa, .report-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 5px;
+  }
+  
+  /* Add these responsive styles */
+  @media (max-width: 768px) {
+    .farmer-d {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .farmer-info {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    
+    .farmer-actions {
+      width: 100%;
+      margin-bottom: 8%;
+      justify-content: flex-start;
+    }
+  }
+
+  /* .farmer-d {
+    width: 100%;
+    background-color: #00a651;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  } */
+
+
+/* .farmer-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  } */
+  
+  /* .farmer-info {
+    display: flex;
+    align-items: center;
+  } */
+  
+  .farmer-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+  }
+  
+  .farmer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .farmer-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .farmer-name {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  
+  .farmer-name h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    margin-right: 6px;
+  }
+  
+  .verified-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background-color: #e6f7ef;
+    border-radius: 50%;
+    color: #00a651;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+  .farmer-trust {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    margin-bottom: 6px;
+  }
+  
+  .view-profile {
+    font-size: 13px;
+    color: #00a651;
+    text-decoration: none;
+  }
+  
+  .view-profile:hover {
+    text-decoration: underline;
+  }
+  
+
+  .view-certificate {
+    font-size: 13px;
+    color: #333;
+    text-decoration: none;
+    margin-right: 15px;
+  }
+  
+  .view-certificate:hover {
+    text-decoration: underline;
+  }
+  
+  .report-seller {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    font-size: 13px;
+    color: #ff4d4f;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .report-icon {
+    margin-right: 5px;
+    font-size: 12px;
+  }
+  
+  .report-seller:hover {
+    text-decoration: underline;
+  }
+
+ 
