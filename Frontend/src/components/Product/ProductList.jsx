@@ -174,12 +174,7 @@ const ProductList = () => {
           >
             Grains
           </button>
-          <button
-            className={selectedCategory === 'Dairy' ? 'active' : ''}
-            onClick={() => handleCategoryChange('Dairy')}
-          >
-            Dairy
-          </button>
+         
         </div>
         <div className='price-sort'>
           <div className="price-range">
