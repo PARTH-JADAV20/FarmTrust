@@ -91,7 +91,7 @@
     line-height: 1.5;
   }
   
-  .product-price {
+  .product-price2 {
     font-size: 28px;
     font-weight: 700;
     color: #00a651;
@@ -406,14 +406,14 @@
     flex-wrap: wrap; /* Add this for better mobile responsiveness */
   }
   
-  .farmer-info {
+  .farmer-info2 {
     display: flex;
     align-items: center;
     flex: 1; /* This allows the info section to take available space */
     margin-bottom: 10px; /* Spacing when it wraps */
   }
   
-  .farmer-actions {
+  .farmer-actions2 {
     display: flex;
     margin-bottom: 8%;
     align-items: center; /* Uncomment this */
@@ -433,52 +433,19 @@
       align-items: flex-start;
     }
     
-    .farmer-info {
+    .farmer-info2 {
       width: 100%;
       margin-bottom: 15px;
     }
     
-    .farmer-actions {
+    .farmer-actions2 {
       width: 100%;
       margin-bottom: 8%;
       justify-content: flex-start;
     }
   }
-
-  /* .farmer-d {
-    width: 100%;
-    background-color: #00a651;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  } */
-
-
-/* .farmer-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  } */
   
-  /* .farmer-info {
-    display: flex;
-    align-items: center;
-  } */
-  
-  .farmer-avatar {
+  .farmer-avatar2 {
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -486,24 +453,24 @@
     margin-right: 15px;
   }
   
-  .farmer-avatar img {
+  .farmer-avatar2 img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
   
-  .farmer-details {
+  .farmer-details2 {
     display: flex;
     flex-direction: column;
   }
   
-  .farmer-name {
+  .farmer-name2 {
     display: flex;
     align-items: center;
     margin-bottom: 4px;
   }
   
-  .farmer-name h3 {
+  .farmer-name2 h3 {
     font-size: 16px;
     font-weight: 600;
     margin: 0;
@@ -523,7 +490,7 @@
     font-weight: bold;
   }
   
-  .farmer-trust {
+  .farmer-trust2 {
     font-size: 14px;
     color: #666;
     margin: 0;
