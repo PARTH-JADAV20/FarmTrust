@@ -10,11 +10,21 @@
     top: 0;
     z-index: 1000;
   }
+
+  .navbar-logo{
+    display: flex;
+  }
+
+  .leaf-logo{
+    font-size: 28px;
+    color:#0D4F19;
+    padding: 0 10px;
+  }
   
   /* Logo Styling */
   .navbar-logo h1 {
     font-size: 28px;
-    color: #000000; /* Black color as per the image */
+    color: #059669; /* Black color as per the image */
     font-weight: 600;
     margin: 0;
     letter-spacing: 1px;
