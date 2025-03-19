@@ -1,4 +1,3 @@
-// src/components/LandingPage.js
 import React from 'react';
 import './LandingPage.css';
 import farmersImage from '../../assets/farmers.jpg'; // Banner image
@@ -9,14 +8,56 @@ import organicGrains from '../../assets/organic-grains.jpg'; // Product image 4
 import rajeshKumar from '../../assets/rajesh-kumar.jpg'; // Farmer image 1 (used for testimonial 1)
 import priyaSingh from '../../assets/priya-singh.jpg'; // Farmer image 2 (used for testimonial 2)
 import amitPatel from '../../assets/amit-patel.jpg'; // Farmer image 3 (used for testimonial 3)
-import { FaUserPlus, FaCheck, FaStore, FaSearch, FaQrcode, FaShoppingCart, FaCertificate, FaStar } from 'react-icons/fa'; // Import required icons
+import { FaUserPlus, FaCheck, FaStore, FaSearch, FaShoppingCart, FaCertificate, FaStar } from 'react-icons/fa'; // Import required icons
+import { IoDocumentTextOutline } from "react-icons/io5"
 import { MdVerifiedUser } from "react-icons/md";
 import { Link } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
+  const { isAuthenticated, loginWithPopup } = useAuth0();
+  const navigate = useNavigate();
+  const handleApplyForFarmer = async () => {
+    if (isAuthenticated) {
+      navigate('/farmer-application');
+    } else {
+      try {
+        await loginWithPopup();
+        if (isAuthenticated) {
+          console.log('Login succeeded, navigating to /farmer-application');
+          navigate('/farmer-application');
+        }
+      } catch (error) {
+        console.error('Login failed or cancelled:', error);
+        return;
+      }
+    }
+
+  };
+  // Function to render stars based on rating and total
+  const renderStars = (rating, total = 5) => {
+    const stars = [];
+    for (let i = 1; i <= total; i++) {
+      stars.push(
+        <FaStar
+          key={i}
+          className={i <= rating ? 'star-icon filled' : 'star-icon empty'}
+        />
+      );
+    }
+    return (
+      <div className="stars">
+        {stars}
+        <span className="review-count">{rating}/{total}</span>
+      </div>
+    );}
+  
+
+  
+
   return (
     <div className="landing-page">
-      {/* Banner Section with Light Green Background */}
       <div className="banner-section">
         <div className="farmer-banner">
           <div className="banner-content">
@@ -26,7 +67,16 @@ const LandingPage = () => {
             <p className="banner-description">
               A transparent marketplace connecting consumers with verified natural farmers.
             </p>
-            <button className="explore-button">Explore Products</button>
+            <div>
+              <button
+                className="explore-button"
+                style={{ backgroundColor: 'black', marginRight: '10px' }}
+                onClick={handleApplyForFarmer}
+              >
+                Apply for Farmer
+              </button>
+              <button className="explore-button">Explore Products</button>
+            </div>
           </div>
           <div className="banner-image">
             <img src={farmersImage} alt="Farmers Illustration" />
@@ -76,27 +126,27 @@ const LandingPage = () => {
               </Link>
             </div>
             <div className="product-card">
-            <Link to='/products'>
-              <img src={freshFruits} alt="Fresh Fruits" className="product-image" />
-              <h3 className="product-title">Fresh Fruits</h3>
-              <p className="product-price">₹149/kg</p>
-              <button className="view-details-button">View Details</button>
+              <Link to='/products'>
+                <img src={freshFruits} alt="Fresh Fruits" className="product-image" />
+                <h3 className="product-title">Fresh Fruits</h3>
+                <p className="product-price">₹149/kg</p>
+                <button className="view-details-button">View Details</button>
               </Link>
             </div>
             <div className="product-card">
-            <Link to='/products'>
-              <img src={pureHoney} alt="Pure Honey" className="product-image" />
-              <h3 className="product-title">Pure Honey</h3>
-              <p className="product-price">₹399/500g</p>
-              <button className="view-details-button">View Details</button>
+              <Link to='/products'>
+                <img src={pureHoney} alt="Pure Honey" className="product-image" />
+                <h3 className="product-title">Pure Honey</h3>
+                <p className="product-price">₹399/500g</p>
+                <button className="view-details-button">View Details</button>
               </Link>
             </div>
             <div className="product-card">
-            <Link to='/products'>
-              <img src={organicGrains} alt="Organic Grains" className="product-image" />
-              <h3 className="product-title">Organic Grains</h3>
-              <p className="product-price">₹299/kg</p>
-              <button className="view-details-button">View Details</button>
+              <Link to='/products'>
+                <img src={organicGrains} alt="Organic Grains" className="product-image" />
+                <h3 className="product-title">Organic Grains</h3>
+                <p className="product-price">₹299/kg</p>
+                <button className="view-details-button">View Details</button>
               </Link>
             </div>
           </div>
@@ -111,6 +161,7 @@ const LandingPage = () => {
               <div className="farmer-info">
                 <h3 className="farmer-name">Rajesh Kumar</h3>
                 <p className="farmer-type">Organic Farming</p>
+                {renderStars(4)} {/* Example rating of 4 out of 5 */}
               </div>
               <MdVerifiedUser className="verified-icon" />
             </div>
@@ -119,6 +170,7 @@ const LandingPage = () => {
               <div className="farmer-info">
                 <h3 className="farmer-name">Priya Singh</h3>
                 <p className="farmer-type">Natural Farming</p>
+                {renderStars(3.5)} {/* Example rating of 3.5 out of 5 */}
               </div>
               <MdVerifiedUser className="verified-icon" />
             </div>
@@ -127,6 +179,7 @@ const LandingPage = () => {
               <div className="farmer-info">
                 <h3 className="farmer-name">Amit Patel</h3>
                 <p className="farmer-type">Sustainable Farming</p>
+                {renderStars(5)} {/* Example rating of 5 out of 5 */}
               </div>
               <MdVerifiedUser className="verified-icon" />
             </div>
@@ -153,11 +206,11 @@ const LandingPage = () => {
               <div className="works-step">
                 <FaSearch className="step-icon" />
                 <div className="step-line"></div>
-                <FaQrcode className="step-icon" />
+                <IoDocumentTextOutline className="step-icon" />
                 <div className="step-line"></div>
                 <FaShoppingCart className="step-icon" />
               </div>
-              <p className="works-description">Browse → Scan QR → Buy</p>
+              <p className="works-description">Browse → Verify Seller → Buy</p>
             </div>
           </div>
         </div>
@@ -167,13 +220,7 @@ const LandingPage = () => {
           <h2 className="section-title">Customer Testimonials</h2>
           <div className="testimonials-container">
             <div className="testimonial-card">
-              <div className="stars">
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-              </div>
+              {renderStars(4)} {/* Example rating of 4 out of 5 */}
               <p className="testimonial-text">
                 "Amazing quality products directly from farmers. The transparency in the system is commendable."
               </p>
@@ -186,13 +233,7 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="testimonial-card">
-              <div className="stars">
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-              </div>
+              {renderStars(3.5)} {/* Example rating of 3.5 out of 5 */}
               <p className="testimonial-text">
                 "The verification process gives me confidence in the authenticity of the products."
               </p>
@@ -205,13 +246,7 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="testimonial-card">
-              <div className="stars">
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-              </div>
+              {renderStars(5)} 
               <p className="testimonial-text">
                 "Fresh products and excellent customer service. Will definitely recommend!"
               </p>
@@ -230,11 +265,12 @@ const LandingPage = () => {
         <div className="community-section">
           <h2 className="community-title">Join Our Growing Community</h2>
           <div className="community-buttons">
-            <button className="community-button">Register as Farmer</button>
-            <button className="community-button">Register as Consumer</button>
+            <button className="community-button">Join Us</button>
           </div>
         </div>
       </div>
+      {/* Footer Section */}
+      
     </div>
   );
 };

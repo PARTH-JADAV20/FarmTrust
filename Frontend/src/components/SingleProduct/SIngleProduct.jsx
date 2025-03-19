@@ -81,24 +81,24 @@ const ProductPage = () => {
             Premium-quality, locally grown organic tomatoes. Harvested daily for maximum freshness and taste.
           </p>
           
-          <div className="product-price">₹499/kg</div>
+          <div className="product-price2">₹499/kg</div>
           
           <div className="farmer-d">
           {/* <div className="farmer-card"> */}
-<div className="farmer-info">
-<div className="farmer-avatar">
+<div className="farmer-info2">
+<div className="farmer-avatar2">
   <img src={rajesh} alt="Rajesh Kumar" />
 </div>
-<div className="farmer-details">
-  <div className="farmer-name">
+<div className="farmer-details2">
+  <div className="farmer-name2">
     <h3>Rajesh Kumar</h3>
     <span className="verified-badge">✓</span>
   </div>
-  <p className="farmer-trust">Trusted by FarmTrust</p>
+  <p className="farmer-trust2">Trusted by FarmTrust</p>
   <a href="#" className="view-profile">View Profile</a>
 </div>
 </div>
-<div className="farmer-actions">
+<div className="farmer-actions2">
 <a href="#" className="view-certificate"> <span className="file-icon-fa"> <FaFileAlt /> </span>View Certificate</a>
 <button className="report-seller">
   <span className="report-icon"><FaFlag /></span>

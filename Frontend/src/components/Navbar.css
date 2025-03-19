@@ -16,7 +16,7 @@
   }
 
   .leaf-logo{
-    font-size: 28px;
+    font-size: 50px;
     color:#0D4F19;
     padding: 0 10px;
   }
@@ -109,6 +109,11 @@
   .icon:hover {
     color: #ff6b6b; /* Lighter red on hover */
     transform: scale(1.2); /* Slight scale effect */
+  }
+
+  .profile-pic:hover{
+    transform: scale(1.2);
+    border: 2px solid #ff6b6b;
   }
   
   /* Sign In Button */

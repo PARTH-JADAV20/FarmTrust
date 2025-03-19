@@ -245,7 +245,7 @@ app.delete('/farmers/:id/products/:productId', async (req, res) => {
 
 app.post('/users', async (req, res) => {
   try {
-    const { name, email, googleId, phone, address, role } = req.body; 
+    const { name, email, phone, address, role } = req.body; 
 
     if (!name || !email) {
       return res.status(400).json({ message: 'Name and email are required' });
