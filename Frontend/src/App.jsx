@@ -1,13 +1,13 @@
 
 import Navbar from './components/Navbar';
-import LandingPage from './components/LandingPage/LandingPage';
+import FarmerProfile from './components/FarmerProfile/FarmerProfile';
 import Footer from './components/Footer';
 function App() {
   
   return (
     <>
      <Navbar/>
-      <LandingPage/>
+      <FarmerProfile/>
      <Footer/>
     </>
   )

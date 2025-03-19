@@ -13,6 +13,25 @@ import { FaUserPlus, FaCheck, FaStore, FaSearch, FaQrcode, FaShoppingCart, FaCer
 import { MdVerifiedUser } from "react-icons/md";
 
 const LandingPage = () => {
+  // Function to render stars based on rating and total
+  const renderStars = (rating, total = 5) => {
+    const stars = [];
+    for (let i = 1; i <= total; i++) {
+      stars.push(
+        <FaStar
+          key={i}
+          className={i <= rating ? 'star-icon filled' : 'star-icon empty'}
+        />
+      );
+    }
+    return (
+      <div className="stars">
+        {stars}
+        <span className="review-count">{rating}/{total}</span>
+      </div>
+    );
+  };
+
   return (
     <div className="landing-page">
       {/* Banner Section with Light Green Background */}
@@ -102,6 +121,7 @@ const LandingPage = () => {
               <div className="farmer-info">
                 <h3 className="farmer-name">Rajesh Kumar</h3>
                 <p className="farmer-type">Organic Farming</p>
+                {renderStars(4)} {/* Example rating of 4 out of 5 */}
               </div>
               <MdVerifiedUser className="verified-icon" />
             </div>
@@ -110,6 +130,7 @@ const LandingPage = () => {
               <div className="farmer-info">
                 <h3 className="farmer-name">Priya Singh</h3>
                 <p className="farmer-type">Natural Farming</p>
+                {renderStars(3.5)} {/* Example rating of 3.5 out of 5 */}
               </div>
               <MdVerifiedUser className="verified-icon" />
             </div>
@@ -118,6 +139,7 @@ const LandingPage = () => {
               <div className="farmer-info">
                 <h3 className="farmer-name">Amit Patel</h3>
                 <p className="farmer-type">Sustainable Farming</p>
+                {renderStars(5)} {/* Example rating of 5 out of 5 */}
               </div>
               <MdVerifiedUser className="verified-icon" />
             </div>
@@ -158,13 +180,7 @@ const LandingPage = () => {
           <h2 className="section-title">Customer Testimonials</h2>
           <div className="testimonials-container">
             <div className="testimonial-card">
-              <div className="stars">
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-              </div>
+              {renderStars(4)} {/* Example rating of 4 out of 5 */}
               <p className="testimonial-text">
                 "Amazing quality products directly from farmers. The transparency in the system is commendable."
               </p>
@@ -177,13 +193,7 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="testimonial-card">
-              <div className="stars">
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-              </div>
+              {renderStars(3.5)} {/* Example rating of 3.5 out of 5 */}
               <p className="testimonial-text">
                 "The verification process gives me confidence in the authenticity of the products."
               </p>
@@ -196,13 +206,7 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="testimonial-card">
-              <div className="stars">
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-                <FaStar className="star-icon" />
-              </div>
+              {renderStars(5)} 
               <p className="testimonial-text">
                 "Fresh products and excellent customer service. Will definitely recommend!"
               </p>
@@ -226,6 +230,8 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
+      {/* Footer Section */}
+      
     </div>
   );
 };
