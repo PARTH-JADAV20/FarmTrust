@@ -4,6 +4,8 @@ import FarmerProfile from './components/FarmerProfile/FarmerProfile';
 import Footer from './components/Footer';
 import ProductList from './components/Product/ProductList';
 import SingleProduct from './components/SingleProduct/SIngleProduct';
+import FarmerApplyForm from './components/FarmerApplyForm/FarmerApplyForm';
+import LandingPage from './components/LandingPage/LandingPage';
 
 
 function App() {
@@ -14,7 +16,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/products" element={<ProductList />} />
         <Route path='/product' element={<SingleProduct />} />
-       
+        <Route path='/farmer-application' element={<FarmerApplyForm />} />
       </Routes>
       <Footer />
     </Router>

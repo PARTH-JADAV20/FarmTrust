@@ -11,35 +11,52 @@
 .explore-section h1 {
   font-size: 2rem;
   color: black;
-  margin-bottom: 30px;
+  margin-bottom: 20px; /* Reduced slightly for smaller screens */
 }
 
-.categories, .price-range, .sort-by {
+.categories {
   width: 100%;
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+  gap: 10px; /* Reduced from 20px for better fit */
   margin-bottom: 15px;
-  font-size: 1.1rem;
+  font-size: 1rem; /* Slightly smaller base font */
   color: #333;
+}
+
+.price-sort {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping for price-range and sort-by */
+  width: 100%;
+  justify-content: space-between;
+  gap: 15px; /* Add gap for wrapped elements */
+}
+
+.price-range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 1rem; /* Consistent with categories */
+  color: #333;
+  flex: 1; /* Allow it to grow/shrink */
+  min-width: 200px; /* Prevent collapse on small screens */
 }
 
 .sort-by {
   display: flex;
-  justify-content:end;
-  gap: 20px;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 15px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #333;
-}
-
-.price-sort{
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
+  justify-content: flex-end; /* Maintain right alignment */
+  flex: 1; /* Allow it to grow/shrink */
+  min-width: 150px; /* Ensure select fits */
 }
 
 .categories button, .sort-by button {
-  padding: 8px 16px;
+  padding: 6px 12px; /* Reduced from 8px 16px for smaller screens */
   background-color: rgb(227, 227, 227);
   border-radius: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -54,7 +71,7 @@
 }
 
 .price-range span {
-  padding: 8px 16px;
+  padding: 6px 12px;
   background-color: white;
   border-radius: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -145,7 +162,7 @@
 }
 
 .item-price {
-  color: black;
+  color: #00a651;
   font-size: 1.3rem;
   font-weight: bold;
 }
@@ -165,14 +182,119 @@
   background-color: #333;
 }
 
-/* Responsive styles */
-@media (min-width: 576px) {
+.price-range .price-span {
+  box-shadow: none;
+  border-radius: 0;
+  font-weight: 600;
+}
+
+.price-range .pricerange {
+  box-shadow: none;
+}
+
+.price-range input[type="range"] {
+  width: 100%; /* Full width within container */
+  max-width: 200px; /* Cap for larger screens */
+  cursor: pointer;
+}
+
+.sort-by select {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background-color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.3s ease;
+  width: 100%; /* Full width within container */
+  max-width: 180px; /* Cap for larger screens */
+}
+
+.sort-by select:hover {
+  border-color: #4caf50;
+}
+
+.sort-by select:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Responsive Styles */
+@media (max-width: 576px) {
+  .explore-section h1 {
+    font-size: 1.5rem; /* Smaller heading */
+  }
+
+  .categories {
+    gap: 8px; /* Tighter gap */
+  }
+
+  .categories button, .sort-by button {
+    padding: 5px 10px; /* Even smaller buttons */
+    font-size: 0.9rem;
+  }
+
+  .price-range, .sort-by {
+    flex: 100%; /* Stack on very small screens */
+    justify-content: flex-start; /* Align left when stacked */
+  }
+
+  .price-range input[type="range"] {
+    width: 100%; /* Full width on small screens */
+    max-width: none; /* Remove cap */
+  }
+
+  .sort-by select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .product-card2 {
+    width: calc(100% - 40px);
+  }
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+  .explore-section h1 {
+    font-size: 1.75rem;
+  }
+
+  .categories {
+    gap: 10px;
+  }
+
+  .price-sort {
+    flex-direction: column; /* Stack price-range and sort-by */
+    align-items: flex-start;
+  }
+
+  .price-range, .sort-by {
+    width: 100%; /* Full width within container */
+  }
+
   .product-card2 {
     width: calc(50% - 20px);
   }
 }
 
 @media (min-width: 768px) {
+  .explore-section h1 {
+    font-size: 2rem;
+  }
+
+  .price-sort {
+    flex-direction: row; /* Restore horizontal layout */
+  }
+
+  .price-range input[type="range"] {
+    width: 200px; /* Restore fixed width */
+  }
+
+  .sort-by select {
+    width: 180px;
+  }
+
   .product-card2 {
     width: calc(33.333% - 20px);
   }
@@ -192,71 +314,4 @@
   .product-image2 {
     height: 220px;
   }
-}
-
-.price-range {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.price-range input[type="range"] {
-  width: 100px;
-  cursor: pointer;
-}
-
-.price-range {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.price-range input[type="range"] {
-  width: 200px;
-  cursor: pointer;
-}
-
-.price-range span {
-  font-size: 1.1rem;
-  color: #333;
-}
-
-
-
-.sort-by {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.sort-by select {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  background-color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.sort-by select:hover {
-  border-color: #4caf50;
-}
-
-.sort-by select:focus {
-  border-color: #4caf50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-}
-
-.price-range .price-span{
-box-shadow: none;
-  border-radius: 0;
-  font-weight: 600;
-}
-.price-range .pricerange{
-box-shadow: none;
 }
