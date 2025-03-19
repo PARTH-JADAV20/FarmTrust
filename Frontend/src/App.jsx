@@ -6,7 +6,7 @@ import ProductList from './components/Product/ProductList';
 import SingleProduct from './components/SingleProduct/SIngleProduct';
 import FarmerApplyForm from './components/FarmerApplyForm/FarmerApplyForm';
 import LandingPage from './components/LandingPage/LandingPage';
-
+import UserPrfoile from './components/UserProfile/UserProfile';
 
 function App() {
   return (
@@ -17,6 +17,8 @@ function App() {
         <Route path="/products" element={<ProductList />} />
         <Route path='/product' element={<SingleProduct />} />
         <Route path='/farmer-application' element={<FarmerApplyForm />} />
+        <Route path="/farmer" element={<FarmerProfile />} />
+        <Route path="/user" element={<UserPrfoile />} />
       </Routes>
       <Footer />
     </Router>
