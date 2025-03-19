@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './Slidebar.css';
+import './Sidebar.css';
 import { FaHome, FaBox, FaShoppingCart, FaComments, FaChartBar, FaUser, FaMedal, FaCog, FaTimes } from 'react-icons/fa';
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { FaLeaf } from "react-icons/fa6";

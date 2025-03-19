@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from '../components/Dashboard/Dashboard';
-import Sidebar from './Sidebar/Slidebar';
+import Sidebar from './Sidebar/Sidebar';
 import { FaBars, FaSeedling } from 'react-icons/fa';
 import '../components/Dashboard/Dashboard.css';
 
