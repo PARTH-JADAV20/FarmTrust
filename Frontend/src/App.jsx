@@ -8,7 +8,8 @@ import FarmerApplyForm from './components/FarmerApplyForm/FarmerApplyForm';
 import LandingPage from './components/LandingPage/LandingPage';
 import UserPrfoile from './components/UserProfile/UserProfile';
 import Farmer from './components/Farmer';
-
+import UserOrders from './components/UserOrders/UserOrders';
+import UserCart from './components/UserCart/UserCart';
 function App() {
   return (
     <Router>
@@ -31,6 +32,8 @@ function AppContent() {
         <Route path='/farmer-application' element={<FarmerApplyForm />} />
         <Route path="/farmer" element={<FarmerProfile />} />
         <Route path="/user" element={<UserPrfoile />} />
+        <Route path="/user/orders" element={<UserOrders />} />
+        <Route path="/user/cart" element={<UserCart/>} />
         <Route path="/farmerpanel/*" element={<Farmer />} />
       </Routes>
         <Footer />
