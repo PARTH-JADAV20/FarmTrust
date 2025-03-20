@@ -94,6 +94,10 @@
   margin-bottom: 50px;
 }
 
+.products-layout a{
+  text-decoration: none;
+}
+
 .product-card2 {
   width: calc(100% - 40px);
   border-radius: 8px;

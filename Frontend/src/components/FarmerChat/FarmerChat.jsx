@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { BsSearch, BsPaperclip, BsSend } from 'react-icons/bs';
 import { FaCircle } from 'react-icons/fa';
 import './FarmerChat.css';
-// Import the user image from your assets
 import userImage from '../../assets/priya-singh.jpg'; // Update this path to match your asset location
 
 const FarmerChat = () => {

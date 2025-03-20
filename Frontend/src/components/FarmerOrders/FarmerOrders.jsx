@@ -1,82 +1,83 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useAuth0 } from '@auth0/auth0-react'; // Import Auth0 hook
 import { FaSearch, FaCheck, FaTimes, FaAngleDown } from 'react-icons/fa';
 import './FarmerOrders.css';
-
-// Import images correctly
-import Image1 from '../../assets/tomatoes.jpg';
-import Image2 from '../../assets/potatoes.jpg';
-import Image3 from '../../assets/carrots.jpg'; // Added missing image
-import Profile1 from '../../assets/rajesh-kumar.jpg';
-import Profile2 from '../../assets/priya-singh.jpg';
-import Profile3 from '../../assets/yash.jpg'; // Added missing image
+import { getAllOrders, getProductById, getFarmerByEmail } from '../Api'; // Adjust path to Api.js
 
 const FarmerOrders = () => {
-  // Sample data with fixed image references
-  const initialOrders = [
-    {
-      id: 1,
-      orderDate: "Jan 15, 2025",
-      product: "Organic Tomatoes",
-      productImage: Image1, // Fixed image reference
-      consumer: "John Smith",
-      consumerImage: Profile1, // Fixed image reference
-      quantity: "25 Kg",
-      totalPrice: "₹75.00",
-      status: "Pending",
-      consumerDetails: {
-        address: "123 Farm Road, Green Valley",
-        contactNumber: "+91 9876543210"
-      }
-    },
-    {
-      id: 2,
-      orderDate: "Jan 10, 2025",
-      product: "Fresh Potatoes",
-      productImage: Image2, // Fixed image reference
-      consumer: "Sarah Johnson",
-      consumerImage: Profile2, // Fixed image reference
-      quantity: "10 Kg",
-      totalPrice: "₹45.00",
-      status: "Confirmed",
-      consumerDetails: {
-        address: "456 Harvest Lane, Rural County",
-        contactNumber: "+91 9876543211"
-      }
-    },
-    {
-      id: 3,
-      orderDate: "Jan 5, 2025",
-      product: "Organic Carrots",
-      productImage: Image3, // Fixed image reference
-      consumer: "Michael Brown",
-      consumerImage: Profile3, // Fixed image reference
-      quantity: "15 Kg",
-      totalPrice: "₹60.00",
-      status: "Canceled",
-      consumerDetails: {
-        address: "789 Field Street, Agriculture Town",
-        contactNumber: "+91 9876543212"
-      }
-    }
-  ];
-
-  const [orders, setOrders] = useState(initialOrders);
-  const [filteredOrders, setFilteredOrders] = useState(initialOrders);
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth0(); // Auth0 state
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [orderFilter, setOrderFilter] = useState("All Orders");
   const [sortOrder, setSortOrder] = useState("Newest First");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Add state for dropdown toggles
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
-  
-  // Create refs for dropdowns to detect outside clicks
   const filterDropdownRef = useRef(null);
   const sortDropdownRef = useRef(null);
 
-  // Close dropdowns when clicking outside
+  // Fetch farmer ID and orders on mount
+  useEffect(() => {
+    const fetchFarmerOrders = async () => {
+      if (!isAuthenticated || !user?.email) return;
+
+      setLoading(true);
+      try {
+        // Step 1: Get farmer details by email to fetch _id
+        const farmerData = await getFarmerByEmail(user.email);
+        const farmerId = farmerData.farmer._id;
+
+        // Step 2: Fetch all orders from all users
+        const allOrdersData = await getAllOrders();
+        const allOrders = allOrdersData.orders;
+
+        // Step 3: Filter orders for this farmer
+        const farmerOrders = allOrders.filter(order => order.farmerId === farmerId);
+
+        // Step 4: Fetch product details for each order
+        const enrichedOrders = await Promise.all(
+          farmerOrders.map(async (order, index) => {
+            console.log(order)
+            const product = order.products[0]; // Assuming one product per order for simplicity
+            const productData = await getProductById(product.productId);
+            return {
+              id: order.id || index + 1, // Fallback ID if missing
+              orderDate: new Date(order.orderedAt).toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric'
+              }),
+              product: productData.product.name,
+              productImage: productData.product.images[0] || 'default-image.jpg', // Use first image
+              consumer: order.userName, // Use userEmail as consumer name
+              consumerImage: 'default-profile.jpg', // Placeholder (fetch from user if available)
+              quantity: `${product.quantityInKg} Kg`,
+              totalPrice: `₹${order.totalAmount.toFixed(2)}`,
+              status: order.status.charAt(0).toUpperCase() + order.status.slice(1), // Capitalize
+              consumerDetails: {
+                address: order.userAddress, // Placeholder (fetch from user if needed)
+                contactNumber: order.userPhone // Placeholder
+              }
+            };
+          })
+        );
+
+        setOrders(enrichedOrders);
+        setFilteredOrders(enrichedOrders);
+      } catch (err) {
+        setError(err.message || 'Failed to fetch orders');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFarmerOrders();
+  }, [isAuthenticated, user?.email]);
+
+  // Close dropdowns on outside click
   useEffect(() => {
     function handleClickOutside(event) {
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
@@ -86,31 +87,25 @@ const FarmerOrders = () => {
         setIsSortOpen(false);
       }
     }
-    
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filter orders based on status
+  // Filter orders by status
   const filterOrders = (status) => {
     setOrderFilter(status);
-    setIsFilterOpen(false); // Close dropdown after selection
-    
+    setIsFilterOpen(false);
     if (status === "All Orders") {
       setFilteredOrders(orders);
     } else {
-      const filtered = orders.filter(order => order.status === status);
-      setFilteredOrders(filtered);
+      setFilteredOrders(orders.filter(order => order.status === status));
     }
   };
 
-  // Sort orders based on date
+  // Sort orders by date
   const sortOrders = (sortType) => {
     setSortOrder(sortType);
-    setIsSortOpen(false); // Close dropdown after selection
-    
+    setIsSortOpen(false);
     let sorted = [...filteredOrders];
     if (sortType === "Newest First") {
       sorted.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
@@ -120,64 +115,66 @@ const FarmerOrders = () => {
     setFilteredOrders(sorted);
   };
 
-  // Search orders by consumer or product name
+  // Search orders
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    
     if (term.trim() === "") {
-      filterOrders(orderFilter); // Reset to current filter
+      filterOrders(orderFilter);
     } else {
-      const results = orders.filter(order => 
-        order.consumer.toLowerCase().includes(term) || 
-        order.product.toLowerCase().includes(term)
+      setFilteredOrders(
+        orders.filter(order =>
+          order.consumer.toLowerCase().includes(term) ||
+          order.product.toLowerCase().includes(term)
+        )
       );
-      setFilteredOrders(results);
     }
   };
 
-  // Open order details modal
+  // Open/close modal
   const openOrderModal = (order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
-
-  // Close order details modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedOrder(null);
   };
 
-  // Update order status
+  // Update order status (placeholder - implement PATCH request if needed)
   const updateOrderStatus = (orderId, newStatus) => {
-    const updatedOrders = orders.map(order => 
-      order.id === orderId ? {...order, status: newStatus} : order
+    const updatedOrders = orders.map(order =>
+      order.id === orderId ? { ...order, status: newStatus } : order
     );
     setOrders(updatedOrders);
-    setFilteredOrders(updatedOrders.filter(order => 
+    setFilteredOrders(updatedOrders.filter(order =>
       orderFilter === "All Orders" || order.status === orderFilter
     ));
-    
     if (selectedOrder && selectedOrder.id === orderId) {
-      setSelectedOrder({...selectedOrder, status: newStatus});
+      setSelectedOrder({ ...selectedOrder, status: newStatus });
     }
+    // TODO: Add PATCH request to update status in backend
   };
+
+  if (authLoading || loading) return <div>Loading...</div>;
+  if (!isAuthenticated) return <div>Please log in to view your orders.</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="orders-page">
       <div className="orders-header">
         <h1>My Orders</h1>
         <div className="search-bar">
-          <input 
-            type="text" 
-            placeholder="Search orders..." 
+          <input
+            type="text"
+            placeholder="Search orders..."
             value={searchTerm}
             onChange={handleSearch}
           />
           <FaSearch className="search-icon-d" />
         </div>
       </div>
-      
+
       <div className="filter-sort-container">
         <div className="filter-dropdown" ref={filterDropdownRef}>
           <button className="dropdown-button" onClick={() => setIsFilterOpen(!isFilterOpen)}>
@@ -192,7 +189,7 @@ const FarmerOrders = () => {
             </div>
           )}
         </div>
-        
+
         <div className="sort-dropdown" ref={sortDropdownRef}>
           <button className="dropdown-button" onClick={() => setIsSortOpen(!isSortOpen)}>
             Sort: {sortOrder} <FaAngleDown />
@@ -205,7 +202,7 @@ const FarmerOrders = () => {
           )}
         </div>
       </div>
-      
+
       <div className="orders-table">
         <div className="table-header">
           <div className="header-item">Order Date</div>
@@ -216,7 +213,7 @@ const FarmerOrders = () => {
           <div className="header-item">Status</div>
           <div className="header-item">Actions</div>
         </div>
-        
+
         {filteredOrders.map(order => (
           <div key={order.id} className="order-row" onClick={() => openOrderModal(order)}>
             <div className="order-item">{order.orderDate}</div>
@@ -225,7 +222,7 @@ const FarmerOrders = () => {
               <span>{order.product}</span>
             </div>
             <div className="order-item consumer-item">
-              <img src={order.consumerImage} alt={order.consumer} className="consumer-thumbnail" />
+              <img src="https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png" alt={order.consumer} className="consumer-thumbnail" />
               <span>{order.consumer}</span>
             </div>
             <div className="order-item">{order.quantity}</div>
@@ -236,28 +233,33 @@ const FarmerOrders = () => {
               </span>
             </div>
             <div className="order-item actions-d3">
-              <button className="action-btn-d3 approve-d3" onClick={(e) => {
-                e.stopPropagation();
-                updateOrderStatus(order.id, "Confirmed");
-              }}>
+              <button
+                className="action-btn-d3 approve-d3"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateOrderStatus(order.id, "Confirmed");
+                }}
+              >
                 <FaCheck />
               </button>
-              <button className="action-btn-d3 reject-d3" onClick={(e) => {
-                e.stopPropagation();
-                updateOrderStatus(order.id, "Canceled");
-              }}>
+              <button
+                className="action-btn-d3 reject-d3"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateOrderStatus(order.id, "Canceled");
+                }}
+              >
                 <FaTimes />
               </button>
             </div>
           </div>
         ))}
-        
+
         {filteredOrders.length === 0 && (
           <div className="no-orders">No orders found</div>
         )}
       </div>
-      
-      {/* Order Details Modal */}
+
       {isModalOpen && selectedOrder && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -281,12 +283,12 @@ const FarmerOrders = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="consumer-details">
                 <h3>Consumer Details</h3>
                 <div className="consumer-info">
                   <div className="consumer-avatar">
-                    <img src={selectedOrder.consumerImage} alt={selectedOrder.consumer} />
+                    <img src="https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png" alt={selectedOrder.consumer} />
                     <span>{selectedOrder.consumer}</span>
                   </div>
                   <div className="consumer-contact">
@@ -295,11 +297,11 @@ const FarmerOrders = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="order-actions-d3">
                 <div className="status-update-d3">
                   <span>Status: </span>
-                  <select 
+                  <select
                     value={selectedOrder.status}
                     onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value)}
                     className={`status-dropdown-d3 ${selectedOrder.status.toLowerCase()}`}

@@ -1,14 +1,14 @@
 import React from 'react';
 import './LandingPage.css';
-import farmersImage from '../../assets/farmers.jpg'; // Banner image
-import organicVegetables from '../../assets/organic-vegetables.jpg'; // Product image 1
-import freshFruits from '../../assets/fresh-fruits.jpg'; // Product image 2
-import pureHoney from '../../assets/pure-honey.jpg'; // Product image 3
-import organicGrains from '../../assets/organic-grains.jpg'; // Product image 4
-import rajeshKumar from '../../assets/rajesh-kumar.jpg'; // Farmer image 1 (used for testimonial 1)
-import priyaSingh from '../../assets/priya-singh.jpg'; // Farmer image 2 (used for testimonial 2)
-import amitPatel from '../../assets/amit-patel.jpg'; // Farmer image 3 (used for testimonial 3)
-import { FaUserPlus, FaCheck, FaStore, FaSearch, FaShoppingCart, FaCertificate, FaStar } from 'react-icons/fa'; // Import required icons
+import farmersImage from '../../assets/farmers.jpg'; 
+import organicVegetables from '../../assets/organic-vegetables.jpg'; 
+import freshFruits from '../../assets/fresh-fruits.jpg'; 
+import pureHoney from '../../assets/pure-honey.jpg'; 
+import organicGrains from '../../assets/organic-grains.jpg'; 
+import rajeshKumar from '../../assets/rajesh-kumar.jpg'; 
+import priyaSingh from '../../assets/priya-singh.jpg'; 
+import amitPatel from '../../assets/amit-patel.jpg'; 
+import { FaUserPlus, FaCheck, FaStore, FaSearch, FaShoppingCart, FaCertificate, FaStar } from 'react-icons/fa'; 
 import { IoDocumentTextOutline } from "react-icons/io5"
 import { MdVerifiedUser } from "react-icons/md";
 import { Link } from 'react-router-dom';

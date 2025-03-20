@@ -29,6 +29,9 @@
     border-radius: 8px;
     overflow: hidden;
     margin-bottom: 10px;
+    max-height: 500px;
+    max-width: 600px;
+    overflow: hidden;
   }
   
   .main-image {
@@ -48,7 +51,8 @@
   }
   
   .thumbnail {
-    width: 150px;
+    max-width: 150px;
+    max-height: 150px;
     border-radius: 6px;
     overflow: hidden;
     cursor: pointer;
@@ -234,7 +238,7 @@
   }
   
   .related-product-card {
-    min-width: 200px;
+    max-width: 200px;
     border-radius: 8px;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -395,15 +399,11 @@
   .farmer-d {
     width: 100%;
     margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 15px;
     background-color: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    flex-wrap: wrap; /* Add this for better mobile responsiveness */
   }
   
   .farmer-info2 {
@@ -415,9 +415,11 @@
   
   .farmer-actions2 {
     display: flex;
-    margin-bottom: 8%;
-    align-items: center; /* Uncomment this */
-    gap: 15px; /* Better spacing between actions */
+    align-items: center;
+    gap: 15px;
+    padding: 20px 0;
+    flex-wrap: wrap; /* Allow actions to wrap on smaller screens */
+    justify-content: flex-start; /* Align items to the start */
   }
 
   .file-icon-fa, .report-icon {
@@ -425,6 +427,69 @@
     align-items: center;
     margin-right: 5px;
   }
+
+  /* Certificate Iframe Styles */
+.certificate-iframe-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 800px;
+  height: 80vh;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.certificate-iframe {
+  width: 100%;
+  height: calc(100% - 40px); /* Adjust for close button height */
+  border: none;
+}
+
+.close-iframe {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.close-iframe:hover {
+  background: #ff7875;
+}
+
+/* Ensure view-certificate works as a button */
+.view-certificate {
+  font-size: 13px;
+  color: #333;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.view-certificate:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .certificate-iframe-container {
+    width: 90%;
+    height: 70vh;
+  }
+}
   
   /* Add these responsive styles */
   @media (max-width: 768px) {
@@ -440,8 +505,10 @@
     
     .farmer-actions2 {
       width: 100%;
-      margin-bottom: 8%;
-      justify-content: flex-start;
+      padding: 10px 0; /* Reduce padding for mobile */
+      gap: 10px; /* Reduce gap for tighter spacing */
+      flex-direction: column; /* Stack actions vertically on mobile */
+      align-items: flex-start; /* Align items to the left */
     }
   }
   
