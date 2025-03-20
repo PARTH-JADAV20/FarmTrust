@@ -63,9 +63,11 @@ const FarmerProfile = () => {
                 <FaLocationDot /> {farmer.address.city}, {farmer.address.state}
               </p>
               <div className="contact-buttons">
-                <button className="message-btn">
-                  <FiMessageCircle /> Message
-                </button>
+                <Link to="/user/messages" className="message-btn">
+                  <button className="message-btn">
+                    <FiMessageCircle /> Message <Link />
+                  </button>
+                </Link>
                 <button
                   className="call-btn"
                   disabled={!farmer.showPhoneToUsers}
