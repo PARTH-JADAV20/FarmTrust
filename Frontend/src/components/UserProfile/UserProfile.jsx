@@ -2,7 +2,7 @@ import React from 'react';
 import './UserProfile.css'; // Ensure this matches the CSS file name
 import profilePic from '../../assets/priya-singh.jpg'; // Verify the path is correct
 import { FaUser, FaShoppingBag, FaShoppingCart } from 'react-icons/fa'; // React Icons
-
+import { IoLogOutSharp } from "react-icons/io5";
 const UserProfile = () => { 
   return (
     <div className="profile-container">
@@ -20,6 +20,9 @@ const UserProfile = () => {
           </li>
           <li>
             <FaShoppingCart className="icon" /> Cart
+          </li>
+          <li>
+            <IoLogOutSharp className="icon" /> Logout
           </li>
         </ul>
       </div>

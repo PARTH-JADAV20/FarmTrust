@@ -19,7 +19,7 @@ function App() {
 
 function AppContent() {
   const location = useLocation();
-  const isFarmerDashboard = location.pathname.startsWith("/farmer");
+  const isFarmerDashboard = location.pathname.startsWith("/farmerpanel");
   
   return (
     <>
@@ -31,7 +31,7 @@ function AppContent() {
         <Route path='/farmer-application' element={<FarmerApplyForm />} />
         <Route path="/farmer" element={<FarmerProfile />} />
         <Route path="/user" element={<UserPrfoile />} />
-        <Route path="/farmer/*" element={<Farmer />} />
+        <Route path="/farmerpanel/*" element={<Farmer />} />
       </Routes>
         <Footer />
     </>

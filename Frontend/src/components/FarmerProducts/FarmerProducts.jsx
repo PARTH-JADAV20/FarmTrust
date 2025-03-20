@@ -177,7 +177,7 @@ const FarmerProducts = () => {
         {products.map(product => (
           <div key={product.id} className="product-card">
             <div className="product-image-container">
-              <img src={product.image} alt={product.name} className="product-image" />
+              <img src={product.image} alt={product.name} className="product-image-d1" />
               <span className={`stock-badge ${product.inStock ? 'in-stock' : 'out-of-stock'}`}>
                 {product.inStock ? 'In Stock' : 'Out of Stock'}
               </span>
@@ -336,12 +336,12 @@ const FarmerProducts = () => {
                           <div className="upload-placeholder">
                             <input 
                               type="file" 
-                              id={`product-image-${index}`} 
+                              id={`product-image-d1-${index}`} 
                               accept="image/*" 
                               onChange={(e) => handleIndividualFileChange(e, index)}
                               className="file-input"
                             />
-                            <label htmlFor={`product-image-${index}`} className="upload-label-small">
+                            <label htmlFor={`product-image-d1-${index}`} className="upload-label-small">
                               <FaUpload />
                               <span>Image {index + 1}</span>
                             </label>
