@@ -4,6 +4,8 @@ import Dashboard from '../components/Dashboard/Dashboard';
 import Sidebar from './Sidebar/Sidebar';
 import { FaBars, FaSeedling } from 'react-icons/fa';
 import '../components/Dashboard/Dashboard.css';
+import ProfileFarmer from './ProfileFarmer/ProfileFarmer';
+import FarmerProducts from './FarmerProducts/FarmerProducts';
 
 const Farmer = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -33,7 +35,8 @@ const Farmer = () => {
         <Routes>
           <Route path="/" element={<Navigate to="/farmer/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          
+          <Route path="/profile" element={<ProfileFarmer />} />
+          <Route path="/products" element={<FarmerProducts />} />
           {/* Add more routes here as needed */}
         </Routes>
       </div>
