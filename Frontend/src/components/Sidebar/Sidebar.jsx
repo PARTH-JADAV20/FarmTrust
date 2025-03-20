@@ -5,6 +5,7 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import { FaLeaf } from "react-icons/fa6";
 import { Link, useLocation } from 'react-router-dom';
 import { RiDashboardFill } from "react-icons/ri";
+import { IoLogOutSharp } from "react-icons/io5";
 
 const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
   const location = useLocation();
@@ -72,6 +73,12 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
           <div className={`da-nav-item ${activePath === '/farmerpanel/analytics' ? 'da-active' : ''}`} onClick={toggleSidebar}>
             <span className="da-nav-icon"><FaChartBar /></span>
             <span className="da-nav-text">Analytics</span>
+          </div>
+          </Link>
+          <Link to='/'>
+          <div className={`da-nav-item ${activePath === '/' ? 'da-active' : ''}`} onClick={toggleSidebar}>
+            <span className="da-nav-icon"><IoLogOutSharp /></span>
+            <span className="da-nav-text">Logout</span>
           </div>
           </Link>
           

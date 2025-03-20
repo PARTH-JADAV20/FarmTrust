@@ -170,7 +170,7 @@ const LandingPage = () => {
               <div className="farmer-info">
                 <h3 className="farmer-name">Priya Singh</h3>
                 <p className="farmer-type">Natural Farming</p>
-                {renderStars(3.5)} {/* Example rating of 3.5 out of 5 */}
+                {renderStars(3)} {/* Example rating of 3 out of 5 */}
               </div>
               <MdVerifiedUser className="verified-icon" />
             </div>
