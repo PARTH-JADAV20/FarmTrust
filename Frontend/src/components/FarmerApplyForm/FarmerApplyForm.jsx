@@ -165,7 +165,7 @@ export default function FarmerApplyForm() {
           <h1>Farmer Application Status</h1>
           <div className="verification-message">
             <p>
-              Your documents are under verification. This process may take up to 7-8 days. We’ll notify you at {formData.email} once reviewed.
+              Your documents are under verification. This process may take up to 7-8 days. We'll notify you at {formData.email} once reviewed.
             </p>
           </div>
         </div>
@@ -177,10 +177,7 @@ export default function FarmerApplyForm() {
   return (
     <div className="farmer-apply-container">
       <h1>Apply for Farmer Role</h1>
-      <p className="instructions">
-        <strong>Instructions:</strong> If you are selling packaged products (e.g., packed organic dry fruits), an FSSAI certificate is compulsory. If you have an FSSAI certificate, please upload it below. The organic farm document is mandatory for all applicants. <strong>All documents must be in PDF format and under 5MB.</strong>
-      </p>
-
+      
       <form onSubmit={handleSubmit} className="farmer-apply-form">
         <div className="form-group">
           <label htmlFor="name">Name</label>
@@ -222,13 +219,17 @@ export default function FarmerApplyForm() {
 
         <div className="form-group">
           <label htmlFor="organicFarmDoc">Organic Farm Document (Compulsory)</label>
-          <input
-            type="file"
-            id="organicFarmDoc"
-            name="organicFarmDoc"
-            onChange={handleFileChange}
-            accept=".pdf"
-          />
+          <div className="file-input-wrapper">
+            <label htmlFor="organicFarmDoc" className="custom-file-input">Select File</label>
+            <input
+              type="file"
+              id="organicFarmDoc"
+              name="organicFarmDoc"
+              onChange={handleFileChange}
+              accept=".pdf"
+              className="hidden-file-input"
+            />
+          </div>
           {errors.organicFarmDoc && <span className="error">{errors.organicFarmDoc}</span>}
           {formData.organicFarmDoc && (
             <p className="file-info">Selected: {formData.organicFarmDoc.name}</p>
@@ -237,17 +238,27 @@ export default function FarmerApplyForm() {
 
         <div className="form-group">
           <label htmlFor="fssaiDoc">FSSAI Certificate (Optional)</label>
-          <input
-            type="file"
-            id="fssaiDoc"
-            name="fssaiDoc"
-            onChange={handleFileChange}
-            accept=".pdf"
-          />
+          <div className="file-input-wrapper">
+            <label htmlFor="fssaiDoc" className="custom-file-input">Select File</label>
+            <input
+              type="file"
+              id="fssaiDoc"
+              name="fssaiDoc"
+              onChange={handleFileChange}
+              accept=".pdf"
+              className="hidden-file-input"
+            />
+          </div>
           {errors.fssaiDoc && <span className="error">{errors.fssaiDoc}</span>}
           {formData.fssaiDoc && (
             <p className="file-info">Selected: {formData.fssaiDoc.name}</p>
           )}
+        </div>
+
+        <div className="instructions-box">
+          <p className="instructions">
+            <strong>Instructions:</strong> If you are selling packaged products (e.g., packed organic dry fruits), an FSSAI certificate is compulsory. If you have an FSSAI certificate, please upload it below. The organic farm document is mandatory for all applicants. <strong>All documents must be in PDF format and under 5MB.</strong>
+          </p>
         </div>
 
         <button type="submit" className="submit-btn">
