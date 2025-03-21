@@ -16,6 +16,8 @@ const Farmer = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  const currentUserEmail = "priy.mavani.01@gmail.com";
+  const userType = "customer"
   return (
     <div className="da-dashboard-container">
       {/* Mobile Menu Button */}
@@ -39,7 +41,7 @@ const Farmer = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<ProfileFarmer />} />
           <Route path="/products" element={<FarmerProducts />} />
-          <Route path="/messages" element={<FarmerChat/>} />
+          <Route path="/messages" element={<FarmerChat currentUserEmail={currentUserEmail} userType={userType}/>} />
           <Route path="/orders" element={<FarmerOrders/>} />
           {/* Add more routes here as needed */}
         </Routes>
