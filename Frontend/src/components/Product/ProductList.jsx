@@ -1,88 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import '../Product/ProductList.css';
-import image from '../../assets/images/carrat.png';
+import { getAllProducts } from '../Api';
+import { Link } from 'react-router-dom';
 
 const ProductList = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortOrder, setSortOrder] = useState('newest');
-  const [maxPrice, setMaxPrice] = useState(1000); // Only max price slider
+  const [maxPrice, setMaxPrice] = useState(1000);
+  const [products, setProducts] = useState([]); 
+  const [loading, setLoading] = useState(true); 
 
-  const products = [
-    {
-      id: 1,
-      name: 'Organic Carrots',
-      price: 120,
-      rating: 4,
-      reviews: 24,
-      image: image,
-      category: 'Vegetables',
-    },
-    {
-      id: 2,
-      name: 'Fresh Apples',
-      price: 180,
-      rating: 5,
-      reviews: 36,
-      image: image,
-      category: 'Fruits',
-    },
-    {
-      id: 3,
-      name: 'Brown Rice',
-      price: 90,
-      rating: 4,
-      reviews: 18,
-      image: image,
-      category: 'Grains',
-    },
-    {
-      id: 4,
-      name: 'Organic Milk',
-      price: 60,
-      rating: 5,
-      reviews: 42,
-      image: image,
-      category: 'Dairy',
-    },
-    {
-      id: 5,
-      name: 'Organic Carrots',
-      price: 120,
-      rating: 4,
-      reviews: 24,
-      image: image,
-      category: 'Vegetables',
-    },
-    {
-      id: 6,
-      name: 'Fresh Apples',
-      price: 180,
-      rating: 5,
-      reviews: 36,
-      image: image,
-      category: 'Fruits',
-    },
-    {
-      id: 7,
-      name: 'Brown Rice',
-      price: 90,
-      rating: 4,
-      reviews: 18,
-      image: image,
-      category: 'Grains',
-    },
-    {
-      id: 8,
-      name: 'Organic Milk',
-      price: 60,
-      rating: 5,
-      reviews: 42,
-      image: image,
-      category: 'Dairy',
-    },
-    // Add more products as needed
-  ];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getAllProducts(); 
+        const transformedProducts = data.products.map((product, index) => ({
+          id: product.id,
+          name: product.name,
+          price: product.mrpPerKg,
+          rating: product.rating.average || 0, 
+          reviews: product.rating.count || 0,  
+          image: product.images[0],           
+          category: product.category.charAt(0).toUpperCase() + product.category.slice(1) 
+        }));
+        setProducts(transformedProducts);
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+        setLoading(false); 
+      }
+    };
+
+    fetchProducts();
+  }, []); 
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
@@ -127,8 +78,9 @@ const ProductList = () => {
   };
 
   const ProductCard = ({ product }) => {
+    console.log(product)
     return (
-      <div className="product-card2">
+      <Link to={`/products/${product.id}`} className="product-card2"> 
         <div className="product-image2">
           <img src={product.image} alt={product.name} />
         </div>
@@ -139,47 +91,37 @@ const ProductList = () => {
         </div>
         <div className="product-footer2">
           <div className="item-price">₹{product.price}/kg</div>
-          <button className="add-to-cart-btn">Add to Cart</button>
+          <button className="add-to-cart-btn" onClick={(e) => e.preventDefault()}>Add to Cart</button>
         </div>
-      </div>
+      </Link>
     );
   };
+
+  const categories = ['All', ...new Set(products.map(product => product.category))];
+
+  if (loading) {
+    return <div>Loading products...</div>; 
+  }
 
   return (
     <div className="Productlist-container">
       <div className="explore-section">
         <h1>Explore Natural Products</h1>
         <div className="categories">
-          <button
-            className={selectedCategory === 'All' ? 'active' : ''}
-            onClick={() => handleCategoryChange('All')}
-          >
-            All
-          </button>
-          <button
-            className={selectedCategory === 'Vegetables' ? 'active' : ''}
-            onClick={() => handleCategoryChange('Vegetables')}
-          >
-            Vegetables
-          </button>
-          <button
-            className={selectedCategory === 'Fruits' ? 'active' : ''}
-            onClick={() => handleCategoryChange('Fruits')}
-          >
-            Fruits
-          </button>
-          <button
-            className={selectedCategory === 'Grains' ? 'active' : ''}
-            onClick={() => handleCategoryChange('Grains')}
-          >
-            Grains
-          </button>
-         
+          {categories.map(category => (
+            <button
+              key={category}
+              className={selectedCategory === category ? 'active' : ''}
+              onClick={() => handleCategoryChange(category)}
+            >
+              {category}
+            </button>
+          ))}
         </div>
-        <div className='price-sort'>
+        <div className="price-sort">
           <div className="price-range">
-            <span className='price-span'>Price Range</span>
-            <span className='pricerange'>₹0 - ₹{maxPrice}</span>
+            <span className="price-span">Price Range</span>
+            <span className="pricerange">₹0 - ₹{maxPrice}</span>
             <input
               type="range"
               min="0"

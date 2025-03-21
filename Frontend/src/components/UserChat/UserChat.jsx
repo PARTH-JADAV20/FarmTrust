@@ -1,21 +1,20 @@
-// CustomerSupportUI.jsx
 import React, { useState } from 'react';
 import { BsSearch, BsPaperclip, BsSend } from 'react-icons/bs';
 import { FaCircle } from 'react-icons/fa';
-import './FarmerChat.css';
-import userImage from '../../assets/priya-singh.jpg'; // Update this path to match your asset location
+import userImage from '../../assets/priya-singh.jpg'; 
+import './UserChat.css'; // Make sure to uncomment and use this
 
-const FarmerChat = () => {
+const UserChat = () => {
   const [message, setMessage] = useState('');
   const [activeTab, setActiveTab] = useState('Recent');
 
   return (
-    <div className="customer-support-container">
+    <div className="user-chat-container">
       {/* Left Panel */}
       <div className="left-panel">
         <div className="search-container">
           <BsSearch className="search-icon" />
-          <input type="text" placeholder="Search messages..." className="search-input" />
+          <input type="text" placeholder="Search chats..." className="search-input" />
         </div>
         
         <div className="tabs-container">
@@ -31,63 +30,57 @@ const FarmerChat = () => {
           >
             Recent
           </button>
-          <button 
-            className={`tab-button ${activeTab === 'Product Inquiry' ? 'active' : ''}`}
-            onClick={() => setActiveTab('Product Inquiry')}
-          >
-            Product Inquiry
-          </button>
         </div>
         
         <div className="conversations-list">
           <div className="conversation-item selected">
             <div className="avatar">
-              <img src={userImage} alt="Sarah Johnson" />
+              <img src={userImage} alt="Priya Singh" />
             </div>
             <div className="conversation-details">
               <div className="conversation-header">
-                <span className="customer-name">Sarah Johnson</span>
-                <span className="message-time">10:45 AM</span>
+                <span className="user-name">Priya Singh</span>
+                <span className="message-time">11:20 AM</span>
               </div>
-              <div className="message-preview">Is the organic tomatoes still available?</div>
-              <div className="message-date">15/03/2025</div>
+              <div className="message-preview">Hey, how’s it going?</div>
+              <div className="message-date">20/03/2025</div>
             </div>
           </div>
-          {/* Additional conversation items would go here */}
+          {/* Add more conversation items as needed */}
         </div>
       </div>
       
       {/* Right Panel */}
       <div className="right-panel">
-        <div className="customer-header">
-          <div className="customer-info">
-            <img src={userImage} alt="Sarah Johnson" className="customer-avatar" />
-            <div className="customer-details">
-              <div className="customer-name">Sarah Johnson</div>
-              <div className="customer-status">
+        <div className="chat-header">
+          <div className="user-info">
+            <img src={userImage} alt="Priya Singh" className="user-avatar" />
+            <div className="user-details">
+              <div className="user-name">Priya Singh</div>
+              <div className="user-status">
                 <FaCircle className="status-icon online" />
                 <span>Online</span>
               </div>
             </div>
           </div>
-          <div className="chat-started">Chat started on 12/03/2025</div>
+          <div className="chat-started">Chat started on 18/03/2025</div>
         </div>
         
         <div className="messages-container">
-          <div className="date-separator">14 March 2025</div>
+          <div className="date-separator">20 March 2025</div>
           
-          <div className="message customer-message">
+          <div className="message received-message">
             <div className="message-content">
-              Hello! I'm interested in your organic tomatoes.
+              Hi! How are you today?
             </div>
-            <div className="message-time">10:30 AM</div>
+            <div className="message-time">11:15 AM</div>
           </div>
           
-          <div className="message admin-message">
+          <div className="message sent-message">
             <div className="message-content">
-              Hi Sarah! Yes, they're available. How many pounds would you like?
+              Hey! I’m good, thanks. How about you?
             </div>
-            <div className="message-time">10:32 AM</div>
+            <div className="message-time">11:17 AM</div>
           </div>
         </div>
         
@@ -106,13 +99,13 @@ const FarmerChat = () => {
         </div>
         
         <div className="quick-replies">
-          <button className="quick-reply-button">Yes, available</button>
-          <button className="quick-reply-button">Price details</button>
-          <button className="quick-reply-button">Shipping info</button>
+          <button className="quick-reply-button">Hey there!</button>
+          <button className="quick-reply-button">How’s it going?</button>
+          <button className="quick-reply-button">See you later</button>
         </div>
       </div>
     </div>
   );
 };
 
-export default FarmerChat;
+export default UserChat;

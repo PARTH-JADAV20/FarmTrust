@@ -5,6 +5,8 @@ const farmerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   phone: { type: String, default: '' },
+  profilePic: { type: String, default: '' },
+  showPhoneToUsers: { type: Boolean, default: false },
   address: { 
     street: { type: String, default: '' },
     city: { type: String, default: '' },
@@ -28,7 +30,7 @@ const farmerSchema = new mongoose.Schema({
     mrpPerKg: { type: Number, required: true },
     images: { type: [String], default: [] },
     description: { type: String, default: '' },
-    category: { type: String, enum: ['fruits', 'vegetables'], required: true },
+    category: { type: String, enum: ['fruits', 'vegetables', 'grains'], required: true },
     subcategory: { type: String, required: true },
     stockInKg: { type: Number, required: true },
     rating: {

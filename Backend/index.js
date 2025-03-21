@@ -38,9 +38,9 @@ const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    if (file.fieldname === 'productImages') {
+    if (file.fieldname === 'productImages' || file.fieldname === 'profilePic') {
       if (!file.mimetype.startsWith('image/')) {
-        return cb(new Error('Product images must be image files'));
+        return cb(new Error('Product images and profile picture must be image files'));
       }
     } else if (file.fieldname === 'fssaiCert' || file.fieldname === 'organicCert') {
       if (file.mimetype !== 'application/pdf') {
@@ -52,7 +52,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit per file
 });
 
-app.post('/farmers', async (req, res) => {
+app.post('/farmers', upload.single('profilePic'), async (req, res) => {
   try {
     const { name, email } = req.body;
 
@@ -60,10 +60,25 @@ app.post('/farmers', async (req, res) => {
       return res.status(400).json({ message: 'Name and email are required' });
     }
 
+    let profilePicUrl = '';
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: 'farmers/profile_pics', resource_type: 'image' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(req.file.buffer);
+      });
+      profilePicUrl = result.secure_url;
+    }
+
     const farmerData = {
       _id: new ObjectId().toString(),
       name,
       email,
+      profilePic: profilePicUrl || 'https://us.123rf.com/450wm/glebdesign159/glebdesign1592409/glebdesign159240900440/235164018-cartoon-vector-illustration-of-farmer.jpg?ver=6' // Default if no upload
     };
 
     const farmer = new Farmer(farmerData);
@@ -74,7 +89,6 @@ app.post('/farmers', async (req, res) => {
       farmerId: farmer._id
     });
   } catch (error) {
-    console.error('Error creating farmer:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -82,14 +96,12 @@ app.post('/farmers', async (req, res) => {
 app.patch('/farmers/:id', upload.fields([
   { name: 'productImages', maxCount: 4 },
   { name: 'fssaiCert', maxCount: 1 },
-  { name: 'organicCert', maxCount: 1 }
+  { name: 'organicCert', maxCount: 1 },
+  { name: 'profilePic', maxCount: 1 }
 ]), async (req, res) => {
   try {
     const { id } = req.params;
-    const { phone, address, description, deliveryCharge, products } = req.body;
-
-    console.log('Request body:', req.body); 
-    console.log('Uploaded files:', req.files); 
+    const { phone, address, description, deliveryCharge, products, showPhoneToUsers } = req.body;
 
     const farmer = await Farmer.findById(id);
     if (!farmer) {
@@ -100,30 +112,39 @@ app.patch('/farmers/:id', upload.fields([
     if (address) farmer.address = JSON.parse(address);
     if (description) farmer.description = description;
     if (deliveryCharge) farmer.deliveryCharge = deliveryCharge;
+    if (showPhoneToUsers !== undefined) farmer.showPhoneToUsers = showPhoneToUsers === 'true' || showPhoneToUsers === true;
+
+    // Upload profile picture to Cloudinary
+    if (req.files['profilePic']) {
+      const profilePicFile = req.files['profilePic'][0];
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: 'farmers/profile_pics', resource_type: 'image' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(profilePicFile.buffer);
+      });
+      farmer.profilePic = result.secure_url;
+      console.log('Updated Profile Pic URL:', result.secure_url);
+    }
 
     // Upload product images to Cloudinary
     const productImages = [];
     if (req.files['productImages']) {
       for (const file of req.files['productImages']) {
-        console.log('Uploading file:', file.originalname, file.mimetype, file.buffer.length); 
         const result = await new Promise((resolve, reject) => {
           cloudinary.uploader.upload_stream(
             { folder: 'farmers/products', resource_type: 'image' },
             (error, result) => {
-              if (error) {
-                console.error('Cloudinary upload error:', error);
-                reject(error);
-              } else {
-                console.log('Upload result:', result); 
-                resolve(result);
-              }
+              if (error) reject(error);
+              else resolve(result);
             }
           ).end(file.buffer);
         });
         productImages.push(result.secure_url);
       }
-    } else {
-      console.log('No product images uploaded');
     }
 
     // Upload certificates to Cloudinary
@@ -131,11 +152,7 @@ app.patch('/farmers/:id', upload.fields([
       const fssaiFile = req.files['fssaiCert'][0];
       const fssaiResult = await new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(
-          {
-            folder: 'farmers/certificates',
-            resource_type: 'raw',
-            public_id: `${Date.now()}-${fssaiFile.originalname}` 
-          },
+          { folder: 'farmers/certificates', resource_type: 'raw', public_id: `${Date.now()}-${fssaiFile.originalname}` },
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
@@ -143,18 +160,13 @@ app.patch('/farmers/:id', upload.fields([
         ).end(fssaiFile.buffer);
       });
       farmer.certificates.fssai = fssaiResult.secure_url;
-      console.log('FSSAI URL:', fssaiResult.secure_url);
     }
 
     if (req.files['organicCert']) {
       const organicFile = req.files['organicCert'][0];
       const organicResult = await new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(
-          {
-            folder: 'farmers/certificates',
-            resource_type: 'raw',
-            public_id: `${Date.now()}-${organicFile.originalname}`
-          },
+          { folder: 'farmers/certificates', resource_type: 'raw', public_id: `${Date.now()}-${organicFile.originalname}` },
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
@@ -162,30 +174,24 @@ app.patch('/farmers/:id', upload.fields([
         ).end(organicFile.buffer);
       });
       farmer.certificates.organicFarm = organicResult.secure_url;
-      console.log('Organic URL:', organicResult.secure_url);
     }
 
     if (products) {
       const parsedProducts = JSON.parse(products);
-      const newProducts = parsedProducts.map(product => {
-        const productId = new ObjectId().toString();
-        console.log('New Product id:', productId);
-        return {
-          id: productId,
-          name: product.name,
-          mrpPerKg: product.mrpPerKg,
-          images: productImages.length ? productImages : [], 
-          description: product.description || '', 
-          category: product.category,
-          subcategory: product.subcategory,
-          stockInKg: product.stockInKg,
-        };
-      });
+      const newProducts = parsedProducts.map(product => ({
+        id: new ObjectId().toString(),
+        name: product.name,
+        mrpPerKg: product.mrpPerKg,
+        images: productImages.length ? productImages : [],
+        description: product.description || '',
+        category: product.category,
+        subcategory: product.subcategory,
+        stockInKg: product.stockInKg,
+      }));
       farmer.products.push(...newProducts);
     }
 
     await farmer.save();
-    console.log('Updated farmer products:', farmer.products);
 
     res.status(200).json({
       message: 'Farmer updated successfully',
@@ -196,6 +202,72 @@ app.patch('/farmers/:id', upload.fields([
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
+
+app.get('/farmers/products', async (req, res) => {
+  try {
+    // Fetch all farmers
+    const farmers = await Farmer.find({}, 'products'); // Only select the products field
+
+    // Flatten all products into a single array
+    const allProducts = farmers.flatMap(farmer => farmer.products);
+
+    res.status(200).json({
+      message: 'All products retrieved successfully',
+      products: allProducts
+    });
+  } catch (error) {
+    console.error('Error fetching all products:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+
+app.get('/farmers/products/:productId', async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    // Find the farmer with the matching product ID and project necessary fields
+    const farmer = await Farmer.findOne(
+      { "products.id": productId },
+      {
+        "products.$": 1, // Get only the matching product
+        name: 1,
+        email: 1,
+        profilePic: 1,
+        isVerified: 1,
+        "certificates.fssai": 1, // Include FSSAI certificate URL
+        "certificates.organicFarm": 1 // Include Organic Farm certificate URL
+      }
+    );
+
+    if (!farmer || !farmer.products.length) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const product = farmer.products[0];
+    res.status(200).json({
+      message: 'Product retrieved successfully',
+      product: {
+        ...product._doc,
+        farmer: {
+          email: farmer.email,
+          name: farmer.name,
+          profilePic: farmer.profilePic,
+          isVerified: farmer.isVerified,
+          certificates: {
+            fssai: farmer.certificates.fssai || '',
+            organicFarm: farmer.certificates.organicFarm || ''
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching product by ID:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 
 app.get('/farmers/:email', async (req, res) => {
   try {
@@ -245,7 +317,7 @@ app.delete('/farmers/:id/products/:productId', async (req, res) => {
 
 app.post('/users', async (req, res) => {
   try {
-    const { name, email, phone, address, role } = req.body; 
+    const { name, email, phone, address, role } = req.body;
 
     if (!name || !email) {
       return res.status(400).json({ message: 'Name and email are required' });
@@ -262,7 +334,7 @@ app.post('/users', async (req, res) => {
       email,
       phone: phone || '',
       address: address || { street: '', city: '', state: '', zipCode: '' },
-      role: role || 'customer' 
+      role: role || 'customer'
     };
 
     const user = new User(userData);
@@ -281,7 +353,7 @@ app.post('/users', async (req, res) => {
 app.patch('/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, googleId, phone, address, cart, orders, role } = req.body; 
+    const { name, email, phone, address, cart, orders, role } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
@@ -298,7 +370,7 @@ app.patch('/users/:id', async (req, res) => {
     }
     if (phone) user.phone = phone;
     if (address) user.address = JSON.parse(address);
-    if (role) user.role = role; 
+    if (role) user.role = role;
 
     if (cart) {
       const parsedCart = JSON.parse(cart);
@@ -306,8 +378,7 @@ app.patch('/users/:id', async (req, res) => {
     }
 
     if (orders) {
-      const parsedOrders = JSON.parse(orders);
-      const newOrders = parsedOrders.map(order => ({
+      const newOrders = orders.map(order => ({
         id: new ObjectId().toString(),
         farmerId: order.farmerId,
         products: order.products.map(product => ({
@@ -377,6 +448,31 @@ app.delete('/users/:id/cart/:productId', async (req, res) => {
     });
   } catch (error) {
     console.error('Error removing cart item:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.get('/orders', async (req, res) => {
+  try {
+    // Fetch orders, name, phone, and address fields from users
+    const users = await User.find({}, { orders: 1, name: 1, phone: 1, address: 1, _id: 0 });
+
+    const allOrders = users.reduce((acc, user) => {
+      const userOrders = user.orders.map(order => ({
+        ...order.toObject(),
+        userName: user.name,
+        userPhone: user.phone || 'Not provided', 
+        userAddress: `${user.address.street}, ${user.address.city}, ${user.address.state} ${user.address.zipCode}`.trim().replace(/\s*,\s*/g, ', ') || 'Not provided' // Single-line address
+      }));
+      return acc.concat(userOrders);
+    }, []);
+
+    res.status(200).json({
+      message: 'All orders retrieved successfully',
+      orders: allOrders
+    });
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

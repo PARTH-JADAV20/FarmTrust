@@ -177,7 +177,7 @@ export default function FarmerApplyForm() {
   return (
     <div className="farmer-apply-container">
       <h1>Apply for Farmer Role</h1>
-      
+
       <form onSubmit={handleSubmit} className="farmer-apply-form">
         <div className="form-group">
           <label htmlFor="name">Name</label>
@@ -217,6 +217,12 @@ export default function FarmerApplyForm() {
           {errors.phone && <span className="error">{errors.phone}</span>}
         </div>
 
+        <div className="instructions-box">
+          <p className="instructions">
+            <strong>Instructions:</strong> If you are selling packaged products (e.g., packed organic dry fruits), an FSSAI certificate is compulsory. If you have an FSSAI certificate, please upload it below. The organic farm document is mandatory for all applicants. <strong>All documents must be in PDF format and under 5MB.</strong>
+          </p>
+        </div>
+
         <div className="form-group">
           <label htmlFor="organicFarmDoc">Organic Farm Document (Compulsory)</label>
           <div className="file-input-wrapper">
@@ -253,12 +259,6 @@ export default function FarmerApplyForm() {
           {formData.fssaiDoc && (
             <p className="file-info">Selected: {formData.fssaiDoc.name}</p>
           )}
-        </div>
-
-        <div className="instructions-box">
-          <p className="instructions">
-            <strong>Instructions:</strong> If you are selling packaged products (e.g., packed organic dry fruits), an FSSAI certificate is compulsory. If you have an FSSAI certificate, please upload it below. The organic farm document is mandatory for all applicants. <strong>All documents must be in PDF format and under 5MB.</strong>
-          </p>
         </div>
 
         <button type="submit" className="submit-btn">
