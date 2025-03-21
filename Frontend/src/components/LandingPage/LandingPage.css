@@ -938,3 +938,17 @@
     font-size: 0.8rem;
   }
 }
+
+.language-switcher-d6 select {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.language-switcher-d6 select:focus {
+  outline: none;
+  border-color: #2e7d32;
+}

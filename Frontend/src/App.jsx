@@ -32,8 +32,6 @@ function AppContent() {
         <Route path='/farmer-application' element={<FarmerApplyForm />} />
         <Route path="/farmer/:email" element={<FarmerProfile />} />
         <Route path="/user/*" element={<UserDashboard />} />
-        <Route path="/user/orders" element={<UserOrders />} />
-        <Route path="/user/cart" element={<UserCart/>} />
         <Route path="/farmerpanel/*" element={<Farmer />} />
       </Routes>
         <Footer />

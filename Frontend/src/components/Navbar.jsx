@@ -6,10 +6,12 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { getUserByEmail } from './Api'
 import { useNavigate } from 'react-router-dom';
 import { IoMdChatbubbles } from "react-icons/io";
+import { useTranslation } from 'react-i18next';
 
 
 const Navbar = () => {
   const { loginWithPopup, user, isAuthenticated, getAccessTokenSilently, logout } = useAuth0();
+    const { i18n } = useTranslation(); 
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -46,6 +48,12 @@ const Navbar = () => {
     }
   };
 
+  // Function to change language
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
+
   return (
     <nav className="navbar">
       <div className="navbar-logo">
@@ -53,15 +61,22 @@ const Navbar = () => {
         <h1>FarmTrust</h1>
       </div>
       <div className="navbar-right">
+        <div className="language-switcher-d6">
+          <select onChange={(e) => changeLanguage(e.target.value)} defaultValue={i18n.language}>
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="gu">Gujarati</option>
+          </select>
+        </div>
         <div className="search-section">
           <FaSearch className="icon" />
           <input type="text" placeholder="Search products..." />
         </div>
         <div className="icon-section">
           <FaBell className="icon" onClick={() => logout({ returnTo: '/' })} />
-          <IoMdChatbubbles  className="icon" />
+          <IoMdChatbubbles className="icon" />
         </div>
-        
+
 
         {isAuthenticated ? (
           <div style={{ cursor: "pointer" }} onClick={handleProfileClick}>

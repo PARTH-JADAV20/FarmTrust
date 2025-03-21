@@ -165,7 +165,7 @@ export default function FarmerApplyForm() {
           <h1>Farmer Application Status</h1>
           <div className="verification-message">
             <p>
-              Your documents are under verification. This process may take up to 7-8 days. We'll notify you at {formData.email} once reviewed.
+              Your documents are under verification. This process may take up to 2-3 days. We'll notify you at {formData.email} once reviewed.
             </p>
           </div>
         </div>

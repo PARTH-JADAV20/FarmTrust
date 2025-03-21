@@ -5,6 +5,8 @@ import { FaFlag, FaFileAlt } from 'react-icons/fa';
 import { MdVerifiedUser } from "react-icons/md";
 import { getProductById, getAllProducts } from '../Api';
 import { Link } from 'react-router-dom';
+import { FaTimes } from "react-icons/fa";
+import { FaPlus, FaMinus } from "react-icons/fa";
 
 const ProductPage = () => {
   const { productId } = useParams(); // Get productId from URL
@@ -15,6 +17,8 @@ const ProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [certificateUrl, setCertificateUrl] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   // Fetch product details and related products when component mounts
   useEffect(() => {
@@ -98,6 +102,41 @@ const ProductPage = () => {
     setCertificateUrl(null); // Clear URL to hide iframe
   };
 
+  const productName = "Organic Farm-Fresh Tomatoes";
+  const productPrice = 499; // Price per kg
+  const deliveryCharge = 40; // Fixed delivery charge
+
+  const openPopup = () => {
+    setShowPopup(true);
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when popup is open
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+    document.body.style.overflow = 'auto'; // Enable scrolling again
+  };
+
+  const increaseQuantity = () => {
+    setQuantity(prevQuantity => prevQuantity + 1);
+  };
+
+  const decreaseQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(prevQuantity => prevQuantity - 1);
+    }
+  };
+
+  // Calculate total price based on quantity
+  const calculateSubtotal = () => {
+    return productPrice * quantity;
+  };
+
+  const calculateTotal = () => {
+    return calculateSubtotal() + deliveryCharge;
+  };
+
+
+
   return (
     <div className="product-page-container">
       <div className="product-main-section">
@@ -174,7 +213,7 @@ const ProductPage = () => {
           </div>
 
           <div className="product-actions">
-            <button className="buy-now-button">Buy Now</button>
+            <button className="buy-now-button" onClick={openPopup}>Buy Now</button>
             <button className="add-to-cart-button">Add to Cart</button>
           </div>
         </div>
@@ -244,6 +283,61 @@ const ProductPage = () => {
           ))}
         </div>
       </div>
+
+      {/* Buy Now Popup */}
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-container">
+            <div className="popup-header">
+              <h3>Complete Your Purchase</h3>
+              <button className="close-popup" onClick={closePopup}>
+                <FaTimes />
+              </button>
+            </div>
+            <div className="popup-content1">
+              <div className="popup-product-info">
+                <img src={mainImage} alt={productName} className="popup-product-image" />
+                <div className="popup-product-details">
+                  <h4>{productName}</h4>
+                  <p className="popup-product-price">₹{productPrice}/kg</p>
+                </div>
+              </div>
+
+              <div className="quantity-selector">
+                <h4>Select Quantity (kg)</h4>
+                <div className="quantity-controls">
+                  <button className="quantity-btn" onClick={decreaseQuantity} disabled={quantity <= 1}>
+                    <FaMinus />
+                  </button>
+                  <span className="quantity-value">{quantity}</span>
+                  <button className="quantity-btn" onClick={increaseQuantity}>
+                    <FaPlus />
+                  </button>
+                </div>
+              </div>
+
+              <div className="price-breakdown">
+                <div className="price-row">
+                  <span>Price:</span>
+                  <span>₹{calculateSubtotal()}</span>
+                </div>
+                <div className="price-row">
+                  <span>Delivery charge:</span>
+                  <span>₹{deliveryCharge}</span>
+                </div>
+                <div className="price-row total">
+                  <span>Total Amount:</span>
+                  <span>₹{calculateTotal()}</span>
+                </div>
+              </div>
+            </div>
+            <div className="popup-footer">
+              <button className="cancel-btn" onClick={closePopup}>Cancel</button>
+              <button className="confirm-btn">Confirm Order</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
