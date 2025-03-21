@@ -14,13 +14,15 @@ const Navbar = () => {
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  
   useEffect(() => {
     const fetchUserRole = async () => {
       if (!isAuthenticated || !user?.email) return;
       setLoading(true);
       try {
         const data = await getUserByEmail(user.email);
+        sessionStorage.setItem('email', user.email);
+        sessionStorage.setItem('role',data.user.role);
         setUserRole(data.user.role);
       } catch (err) {
         setError(err);
