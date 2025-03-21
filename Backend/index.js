@@ -7,15 +7,24 @@ const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const Farmer = require('./models/farmer');
 const User = require('./models/user');
-const http = require('http'); 
-const socketIo = require('socket.io'); 
+const http = require('http');
+const { Server } = require('socket.io');
 const Chat = require('./models/chat');
 
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app); 
-const io = socketIo(server); 
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true,
+  },
+  transports: ['websocket', 'polling'],
+});
+
 const PORT = 5000;
 
 mongoose
@@ -36,7 +45,11 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST'],
+  credentials: true,
+}));
 app.use(express.json());
 
 const storage = multer.memoryStorage();
@@ -54,56 +67,7 @@ const upload = multer({
     }
     cb(null, true);
   },
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit per file
-});
-
-
-
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-  
-  socket.on('joinChat', ({ userEmail, farmerEmail }) => {
-    const room = [userEmail, farmerEmail].sort().join('_');
-    socket.join(room);
-    console.log(`Joined room: ${room}`);
-  });
-
-  socket.on('sendMessage', async ({ senderType, senderEmail, receiverType, receiverEmail, content }) => {
-    try {
-      const userEmail = senderType === 'customer' ? senderEmail : receiverEmail;
-      const farmerEmail = senderType === 'farmer' ? senderEmail : receiverEmail;
-
-      const newMessage = {
-        sender: { type: senderType, email: senderEmail },
-        content,
-      };
-
-      let chat = await Chat.findOne({
-        'participants.userEmail': userEmail,
-        'participants.farmerEmail': farmerEmail,
-      });
-
-      if (!chat) {
-        chat = new Chat({
-          participants: { userEmail, farmerEmail },
-          messages: [newMessage],
-        });
-      } else {
-        chat.messages.push(newMessage);
-      }
-
-      await chat.save();
-
-      const room = [userEmail, farmerEmail].sort().join('_');
-      io.to(room).emit('receiveMessage', newMessage);
-    } catch (error) {
-      console.error('Error saving message:', error);
-    }
-  });
-  
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
+  limits: { fileSize: 5 * 1024 * 1024 }
 });
 
 app.post('/farmers', upload.single('profilePic'), async (req, res) => {
@@ -132,7 +96,7 @@ app.post('/farmers', upload.single('profilePic'), async (req, res) => {
       _id: new ObjectId().toString(),
       name,
       email,
-      profilePic: profilePicUrl || 'https://us.123rf.com/450wm/glebdesign159/glebdesign1592409/glebdesign159240900440/235164018-cartoon-vector-illustration-of-farmer.jpg?ver=6' // Default if no upload
+      profilePic: profilePicUrl || 'https://us.123rf.com/450wm/glebdesign159/glebdesign1592409/glebdesign159240900440/235164018-cartoon-vector-illustration-of-farmer.jpg?ver=6'
     };
 
     const farmer = new Farmer(farmerData);
@@ -168,7 +132,6 @@ app.patch('/farmers/:id', upload.fields([
     if (deliveryCharge) farmer.deliveryCharge = deliveryCharge;
     if (showPhoneToUsers !== undefined) farmer.showPhoneToUsers = showPhoneToUsers === 'true' || showPhoneToUsers === true;
 
-    // Upload profile picture to Cloudinary
     if (req.files['profilePic']) {
       const profilePicFile = req.files['profilePic'][0];
       const result = await new Promise((resolve, reject) => {
@@ -184,7 +147,6 @@ app.patch('/farmers/:id', upload.fields([
       console.log('Updated Profile Pic URL:', result.secure_url);
     }
 
-    // Upload product images to Cloudinary
     const productImages = [];
     if (req.files['productImages']) {
       for (const file of req.files['productImages']) {
@@ -201,7 +163,6 @@ app.patch('/farmers/:id', upload.fields([
       }
     }
 
-    // Upload certificates to Cloudinary
     if (req.files['fssaiCert']) {
       const fssaiFile = req.files['fssaiCert'][0];
       const fssaiResult = await new Promise((resolve, reject) => {
@@ -257,13 +218,9 @@ app.patch('/farmers/:id', upload.fields([
   }
 });
 
-
 app.get('/farmers/products', async (req, res) => {
   try {
-    // Fetch all farmers
-    const farmers = await Farmer.find({}, 'products'); // Only select the products field
-
-    // Flatten all products into a single array
+    const farmers = await Farmer.find({}, 'products');
     const allProducts = farmers.flatMap(farmer => farmer.products);
 
     res.status(200).json({
@@ -276,22 +233,20 @@ app.get('/farmers/products', async (req, res) => {
   }
 });
 
-
 app.get('/farmers/products/:productId', async (req, res) => {
   try {
     const { productId } = req.params;
 
-    // Find the farmer with the matching product ID and project necessary fields
     const farmer = await Farmer.findOne(
       { "products.id": productId },
       {
-        "products.$": 1, // Get only the matching product
+        "products.$": 1,
         name: 1,
         email: 1,
         profilePic: 1,
         isVerified: 1,
-        "certificates.fssai": 1, // Include FSSAI certificate URL
-        "certificates.organicFarm": 1 // Include Organic Farm certificate URL
+        "certificates.fssai": 1,
+        "certificates.organicFarm": 1
       }
     );
 
@@ -321,7 +276,6 @@ app.get('/farmers/products/:productId', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 
 app.get('/farmers/:email', async (req, res) => {
   try {
@@ -508,15 +462,14 @@ app.delete('/users/:id/cart/:productId', async (req, res) => {
 
 app.get('/orders', async (req, res) => {
   try {
-    // Fetch orders, name, phone, and address fields from users
     const users = await User.find({}, { orders: 1, name: 1, phone: 1, address: 1, _id: 0 });
 
     const allOrders = users.reduce((acc, user) => {
       const userOrders = user.orders.map(order => ({
         ...order.toObject(),
         userName: user.name,
-        userPhone: user.phone || 'Not provided', 
-        userAddress: `${user.address.street}, ${user.address.city}, ${user.address.state} ${user.address.zipCode}`.trim().replace(/\s*,\s*/g, ', ') || 'Not provided' // Single-line address
+        userPhone: user.phone || 'Not provided',
+        userAddress: `${user.address.street}, ${user.address.city}, ${user.address.state} ${user.address.zipCode}`.trim().replace(/\s*,\s*/g, ', ') || 'Not provided'
       }));
       return acc.concat(userOrders);
     }, []);
@@ -529,83 +482,162 @@ app.get('/orders', async (req, res) => {
     console.error('Error fetching all orders:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
+});
+
+// Socket.IO Connection
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('joinChat', ({ userEmail, farmerEmail }, callback) => {
+    const normalizedUserEmail = userEmail.toLowerCase();
+    const normalizedFarmerEmail = farmerEmail.toLowerCase();
+    const room = `${normalizedUserEmail}_${normalizedFarmerEmail}`;
+    socket.join(room);
+    console.log(`Joined room: ${room}`);
+    if (callback) callback({ status: 'Joined room successfully' });
   });
 
+  socket.on('sendMessage', async (message, callback) => {
+    try {
+      const { senderType, senderEmail, receiverType, receiverEmail, content } = message;
+      console.log('Received message:', message);
 
-// Chat Routes
-// 1. Get chat history between a user and a farmer
+      if (!senderType || !senderEmail || !receiverType || !receiverEmail || !content) {
+        throw new Error('Invalid message data: Missing required fields');
+      }
+
+      const userEmail = senderType === 'customer' ? senderEmail : receiverEmail;
+      const farmerEmail = senderType === 'farmer' ? senderEmail : receiverEmail;
+
+      const newMessage = {
+        sender: {
+          type: senderType,
+          email: senderEmail,
+        },
+        receiverEmail, // Add receiverEmail for client-side room computation
+        content,
+        createdAt: new Date(),
+        isRead: false,
+      };
+
+      console.log('Updating chat for:', { userEmail, farmerEmail });
+      let chat = await Chat.findOneAndUpdate(
+        {
+          'participants.userEmail': { $regex: new RegExp(`^${userEmail}$`, 'i') },
+          'participants.farmerEmail': { $regex: new RegExp(`^${farmerEmail}$`, 'i') },
+        },
+        {
+          $push: { messages: newMessage },
+          $set: { lastMessageAt: new Date() },
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+
+      console.log('Chat updated:', chat);
+
+      const normalizedUserEmail = userEmail.toLowerCase();
+      const normalizedFarmerEmail = farmerEmail.toLowerCase();
+      const room = `${normalizedUserEmail}_${normalizedFarmerEmail}`;
+      console.log('Emitting message to room:', room);
+      console.log('Message being emitted:', newMessage);
+      io.to(room).emit('receiveMessage', newMessage);
+
+      if (callback) callback({ status: 'Message sent successfully' });
+    } catch (error) {
+      console.error('Error saving message:', error.message, error.stack);
+      if (callback) callback({ error: 'Failed to send message', details: error.message });
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+// Routes
+app.get('/chat/conversations/customer/:userEmail', async (req, res) => {
+  try {
+    const chats = await Chat.find({ 'participants.userEmail': req.params.userEmail })
+      .sort({ lastMessageAt: -1 });
+    const chatData = await Promise.all(chats.map(async (chat) => {
+      const farmer = await Farmer.findOne({ email: chat.participants.farmerEmail }, 'name');
+      return {
+        userEmail: chat.participants.userEmail,
+        farmerEmail: chat.participants.farmerEmail,
+        farmerName: farmer ? farmer.name : 'Unknown Farmer',
+        lastMessage: chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : null,
+        lastMessageAt: chat.lastMessageAt,
+      };
+    }));
+    res.json(chatData);
+  } catch (error) {
+    console.error('Error fetching customer conversations:', error);
+    res.status(500).json({ error: 'Failed to fetch conversations' });
+  }
+});
+
+app.get('/chat/conversations/farmer/:farmerEmail', async (req, res) => {
+  try {
+    const farmerEmail = req.params.farmerEmail;
+    console.log('Fetching chats for farmer:', farmerEmail);
+    const chats = await Chat.find({
+      'participants.farmerEmail': { $regex: new RegExp(`^${farmerEmail}$`, 'i') },
+    }).sort({ lastMessageAt: -1 });
+
+    console.log('Found chats:', chats);
+
+    const chatData = await Promise.all(chats.map(async (chat) => {
+      const user = await User.findOne({ email: chat.participants.userEmail }, 'name');
+      return {
+        userEmail: chat.participants.userEmail,
+        farmerEmail: chat.participants.farmerEmail,
+        userName: user ? user.name : chat.participants.userEmail,
+        lastMessage: chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : null,
+        lastMessageAt: chat.lastMessageAt,
+      };
+    }));
+
+    res.json(chatData);
+  } catch (error) {
+    console.error('Error fetching farmer conversations:', error);
+    res.status(500).json({ error: 'Failed to fetch conversations' });
+  }
+});
+
 app.get('/chat/history', async (req, res) => {
   const { userEmail, farmerEmail } = req.query;
-
   try {
     const chat = await Chat.findOne({
       'participants.userEmail': userEmail,
       'participants.farmerEmail': farmerEmail,
     });
-
-    if (chat) {
-      res.json(chat.messages);
-    } else {
-      res.json([]); // No chat exists yet
+    if (!chat) {
+      return res.json([]);
     }
+    res.json(chat.messages);
   } catch (error) {
     console.error('Error fetching chat history:', error);
     res.status(500).json({ error: 'Failed to fetch chat history' });
   }
 });
 
-// 2. Get all chats for a customer (list of recent chats)
-app.get('/chat/conversations/customer/:userEmail', async (req, res) => {
-  const { userEmail } = req.params;
-
+app.get('/api/farmer/:email', async (req, res) => {
+  const { email } = req.params;
   try {
-    const chats = await Chat.find({
-      'participants.userEmail': userEmail,
-    })
-      .sort({ lastMessageAt: -1 })
-      .populate('participants.farmerEmail', 'name email');
-
-    const result = chats.map(chat => ({
-      userEmail: chat.participants.userEmail,
-      farmerEmail: chat.participants.farmerEmail.email,
-      farmerName: chat.participants.farmerEmail.name,
-      lastMessage: chat.messages[chat.messages.length - 1],
-      lastMessageAt: chat.lastMessageAt,
-    }));
-
-    res.json(result);
+    const farmer = await Farmer.findOne({ email }, 'name email');
+    if (!farmer) {
+      return res.status(404).json({ error: 'Farmer not found' });
+    }
+    res.json({ email: farmer.email, name: farmer.name });
   } catch (error) {
-    console.error('Error fetching customer chats:', error);
-    res.status(500).json({ error: 'Failed to fetch chats' });
+    console.error('Error fetching farmer:', error);
+    res.status(500).json({ error: 'Failed to fetch farmer' });
   }
 });
 
-// 3. Get all chats for a farmer (list of recent chats)
-app.get('/chat/conversations/farmer/:farmerEmail', async (req, res) => {
-  const { farmerEmail } = req.params;
-
-  try {
-    const chats = await Chat.find({
-      'participants.farmerEmail': farmerEmail,
-    })
-      .sort({ lastMessageAt: -1 })
-      .populate('participants.userEmail', 'name email');
-
-    const result = chats.map(chat => ({
-      userEmail: chat.participants.userEmail.email,
-      farmerEmail: chat.participants.farmerEmail,
-      userName: chat.participants.userEmail.name,
-      lastMessage: chat.messages[chat.messages.length - 1],
-      lastMessageAt: chat.lastMessageAt,
-    }));
-
-    res.json(result);
-  } catch (error) {
-    console.error('Error fetching farmer chats:', error);
-    res.status(500).json({ error: 'Failed to fetch chats' });
-  }
-});
-
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
