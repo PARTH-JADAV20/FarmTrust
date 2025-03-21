@@ -1,278 +1,326 @@
-import React from 'react';
-import './LandingPage.css';
-import farmersImage from '../../assets/farmers.jpg'; // Banner image
-import organicVegetables from '../../assets/organic-vegetables.jpg'; // Product image 1
-import freshFruits from '../../assets/fresh-fruits.jpg'; // Product image 2
-import pureHoney from '../../assets/pure-honey.jpg'; // Product image 3
-import organicGrains from '../../assets/organic-grains.jpg'; // Product image 4
-import rajeshKumar from '../../assets/rajesh-kumar.jpg'; // Farmer image 1 (used for testimonial 1)
-import priyaSingh from '../../assets/priya-singh.jpg'; // Farmer image 2 (used for testimonial 2)
-import amitPatel from '../../assets/amit-patel.jpg'; // Farmer image 3 (used for testimonial 3)
-import { FaUserPlus, FaCheck, FaStore, FaSearch, FaShoppingCart, FaCertificate, FaStar } from 'react-icons/fa'; // Import required icons
-import { IoDocumentTextOutline } from "react-icons/io5"
-import { MdVerifiedUser } from "react-icons/md";
-import { Link } from 'react-router-dom';
-import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate } from 'react-router-dom';
+  import React from 'react';
+  import './LandingPage.css';
+  import farmersImage from '../../assets/farmers.jpg'; 
+  import organicVegetables from '../../assets/organic-vegetables.jpg'; 
+  import freshFruits from '../../assets/fresh-fruits.jpg'; 
+  import pureHoney from '../../assets/pure-honey.jpg'; 
+  import organicGrains from '../../assets/organic-grains.jpg'; 
+  import rajeshKumar from '../../assets/rajesh-kumar.jpg'; 
+  import priyaSingh from '../../assets/priya-singh.jpg'; 
+  import amitPatel from '../../assets/amit-patel.jpg'; 
+  // Import additional product images for the shop section
+  import organicCompost from '../../assets/organic-compost.jpg';
+  import naturalPestControl from '../../assets/natural-pest-control.jpg';
+  import soilEnricher from '../../assets/soil-enricher.jpg';
+  import { FaUserPlus, FaCheck, FaStore, FaSearch, FaShoppingCart, FaCertificate, FaStar, FaUser } from 'react-icons/fa'; 
+  import { IoDocumentTextOutline } from "react-icons/io5";
+  import { MdVerifiedUser } from "react-icons/md";
+  import { BiLeaf } from "react-icons/bi";
+  import { Link } from 'react-router-dom';
+  import { useAuth0 } from '@auth0/auth0-react';
+  import { useNavigate } from 'react-router-dom';
 
-const LandingPage = () => {
-  const { isAuthenticated, loginWithPopup } = useAuth0();
-  const navigate = useNavigate();
-  const handleApplyForFarmer = async () => {
-    if (isAuthenticated) {
-      navigate('/farmer-application');
-    } else {
-      try {
-        await loginWithPopup();
-        if (isAuthenticated) {
-          console.log('Login succeeded, navigating to /farmer-application');
-          navigate('/farmer-application');
+  const LandingPage = () => {
+    const { isAuthenticated, loginWithPopup } = useAuth0();
+    const navigate = useNavigate();
+    const handleApplyForFarmer = async () => {
+      if (isAuthenticated) {
+        navigate('/farmer-application');
+      } else {
+        try {
+          await loginWithPopup();
+          if (isAuthenticated) {
+            console.log('Login succeeded, navigating to /farmer-application');
+            navigate('/farmer-application');
+          }
+        } catch (error) {
+          console.error('Login failed or cancelled:', error);
+          return;
         }
-      } catch (error) {
-        console.error('Login failed or cancelled:', error);
-        return;
       }
-    }
-
-  };
-  // Function to render stars based on rating and total
-  const renderStars = (rating, total = 5) => {
-    const stars = [];
-    for (let i = 1; i <= total; i++) {
-      stars.push(
-        <FaStar
-          key={i}
-          className={i <= rating ? 'star-icon filled' : 'star-icon empty'}
-        />
+    };
+    
+    // Function to render stars based on rating and total
+    const renderStars = (rating, total = 5) => {
+      const stars = [];
+      for (let i = 1; i <= total; i++) {
+        stars.push(
+          <FaStar
+            key={i}
+            className={i <= rating ? 'star-icon-d6 filled-d6' : 'star-icon-d6 empty-d6'}
+          />
+        );
+      }
+      return (
+        <div className="stars-d6">
+          {stars}
+          <span className="review-count-d6">{rating}/{total}</span>
+        </div>
       );
-    }
+    };
+
     return (
-      <div className="stars">
-        {stars}
-        <span className="review-count">{rating}/{total}</span>
-      </div>
-    );}
-  
-
-  
-
-  return (
-    <div className="landing-page">
-      <div className="banner-section">
-        <div className="farmer-banner">
-          <div className="banner-content">
-            <h1 className="banner-title">
-              Empowering Farmers, <span>Ensuring Authenticity</span>
-            </h1>
-            <p className="banner-description">
-              A transparent marketplace connecting consumers with verified natural farmers.
-            </p>
-            <div>
-              <button
-                className="explore-button"
-                style={{ backgroundColor: 'black', marginRight: '10px' }}
-                onClick={handleApplyForFarmer}
-              >
-                Apply for Farmer
-              </button>
-              <button className="explore-button">Explore Products</button>
-            </div>
-          </div>
-          <div className="banner-image">
-            <img src={farmersImage} alt="Farmers Illustration" />
-          </div>
-        </div>
-      </div>
-      {/* Content Section with White Background */}
-      <div className="content">
-        {/* Why Choose Us Section */}
-        <div className="why-choose-us">
-          <h2 className="section-title">Why Choose Us</h2>
-          <div className="features">
-            <div className="feature-item">
-              <MdVerifiedUser className="feature-icon" />
-              <h3 className="feature-title">Verified Farmers</h3>
-              <p className="feature-description">
-                Trust & authenticity guaranteed through our rigorous verification process.
+      <div className="landing-page-d6">
+        <div className="banner-section-d6">
+          <div className="farmer-banner-d6">
+            <div className="banner-content-d6">
+              <h1 className="banner-title-d6">
+                Empowering Farmers, <span>Ensuring Authenticity</span>
+              </h1>
+              <p className="banner-description-d6">
+                A transparent marketplace connecting consumers with verified natural farmers.
               </p>
+              <div>
+                <button
+                  className="explore-button-d6"
+                  style={{ backgroundColor: 'black', marginRight: '10px' }}
+                  onClick={handleApplyForFarmer}
+                >
+                  Apply for Farmer
+                </button>
+                <button className="explore-button-d6">Explore Products</button>
+              </div>
             </div>
-            <div className="feature-item">
-              <FaStore className="feature-icon" />
-              <h3 className="feature-title">Direct Market</h3>
-              <p className="feature-description">
-                No middlemen ensuring fair pricing for both farmers and consumers.
-              </p>
-            </div>
-            <div className="feature-item">
-              <FaCertificate className="feature-icon" />
-              <h3 className="feature-title">Certified Farmers</h3>
-              <p className="feature-description">
-                FSSAI, Organic, and other certifications verified.
-              </p>
+            <div className="banner-image-d6">
+              <img src={farmersImage} alt="Farmers Illustration" />
             </div>
           </div>
         </div>
-
-        {/* Featured Products Section */}
-        <div className="featured-products">
-          <h2 className="section-title">Featured Products</h2>
-          <div className="products">
-            <div className="product-card">
-              <Link to='/products'>
-                <img src={organicVegetables} alt="Organic Vegetables" className="product-image" />
-                <h3 className="product-title">Organic Vegetables</h3>
-                <p className="product-price">₹199/kg</p>
-                <button className="view-details-button" >View Details</button>
-              </Link>
-            </div>
-            <div className="product-card">
-              <Link to='/products'>
-                <img src={freshFruits} alt="Fresh Fruits" className="product-image" />
-                <h3 className="product-title">Fresh Fruits</h3>
-                <p className="product-price">₹149/kg</p>
-                <button className="view-details-button">View Details</button>
-              </Link>
-            </div>
-            <div className="product-card">
-              <Link to='/products'>
-                <img src={pureHoney} alt="Pure Honey" className="product-image" />
-                <h3 className="product-title">Pure Honey</h3>
-                <p className="product-price">₹399/500g</p>
-                <button className="view-details-button">View Details</button>
-              </Link>
-            </div>
-            <div className="product-card">
-              <Link to='/products'>
-                <img src={organicGrains} alt="Organic Grains" className="product-image" />
-                <h3 className="product-title">Organic Grains</h3>
-                <p className="product-price">₹299/kg</p>
-                <button className="view-details-button">View Details</button>
-              </Link>
+        {/* Content Section with White Background */}
+        <div className="content-d6">
+          {/* Why Choose Us Section */}
+          <div className="why-choose-us-d6">
+            <h2 className="section-title-d6">Why Choose Us</h2>
+            <div className="features-d6">
+              <div className="feature-item-d6">
+                <MdVerifiedUser className="feature-icon-d6" />
+                <h3 className="feature-title-d6">Verified Farmers</h3>
+                <p className="feature-description-d6">
+                  Trust & authenticity guaranteed through our rigorous verification process.
+                </p>
+              </div>
+              <div className="feature-item-d6">
+                <FaStore className="feature-icon-d6" />
+                <h3 className="feature-title-d6">Direct Market</h3>
+                <p className="feature-description-d6">
+                  No middlemen ensuring fair pricing for both farmers and consumers.
+                </p>
+              </div>
+              <div className="feature-item-d6">
+                <FaCertificate className="feature-icon-d6" />
+                <h3 className="feature-title-d6">Certified Farmers</h3>
+                <p className="feature-description-d6">
+                  FSSAI, Organic, and other certifications verified.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Recommended Farmers Section */}
-        <div className="recommended-farmers">
-          <h2 className="section-title">Recommended Farmers</h2>
-          <div className="farmers">
-            <div className="farmer-card">
-              <img src={rajeshKumar} alt="Rajesh Kumar" className="farmer-image" />
-              <div className="farmer-info">
-                <h3 className="farmer-name">Rajesh Kumar</h3>
-                <p className="farmer-type">Organic Farming</p>
+          {/* Guide Section - Added from the image */}
+          <div className="guide-section-d6">
+            <h2 className="section-title-d6">Your Guide to a Transparent Marketplace</h2>
+            <div className="guides-container-d6">
+              <div className="guide-card-d6">
+                <div className="guide-icon-d6">
+                  <BiLeaf />
+                </div>
+                <h3 className="guide-title-d6">Farmer Guide</h3>
+                <p className="guide-description-d6">Learn how to register, get verified, and sell your products.</p>
+                <button className="read-more-btn-d6">Read More</button>
+              </div>
+              <div className="guide-card-d6">
+                <div className="guide-icon-d6">
+                  <FaUser />
+                </div>
+                <h3 className="guide-title-d6">User Guide</h3>
+                <p className="guide-description-d6">Understand how to browse, verify authenticity, and make purchases.</p>
+                <button className="read-more-btn-d6">Read More</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Shop Organic Products Section - Added from the image */}
+          <div className="shop-section-d6">
+            <h2 className="section-title-d6">Shop Organic Pesticides & Fertilizers</h2>
+            <div className="products-container-d6">
+              <div className="product-item-d6">
+                <img src={organicCompost} alt="Organic Compost Plus" className="product-shop-image-d6" />
+                <h3 className="product-shop-title-d6">Organic Compost Plus</h3>
+                <button className="explore-products-btn-d6">Explore Products</button>
+              </div>
+              <div className="product-item-d6">
+                <img src={naturalPestControl} alt="Natural Pest Control" className="product-shop-image-d6" />
+                <h3 className="product-shop-title-d6">Natural Pest Control</h3>
+                <button className="explore-products-btn-d6">Explore Products</button>
+              </div>
+              <div className="product-item-d6">
+                <img src={soilEnricher} alt="Soil Enricher" className="product-shop-image-d6" />
+                <h3 className="product-shop-title-d6">Soil Enricher</h3>
+                <button className="explore-products-btn-d6">Explore Products</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Featured Products Section */}
+          <div className="featured-products-d6">
+            <h2 className="section-title-d6">Featured Products</h2>
+            <div className="products-d6">
+              <div className="product-card-d6">
+                <Link to='/products'>
+                  <img src={organicVegetables} alt="Organic Vegetables" className="product-image-d6" />
+                  <h3 className="product-title-d6">Organic Vegetables</h3>
+                  <p className="product-price-d6">₹199/kg</p>
+                  <button className="view-details-button-d6" >View Details</button>
+                </Link>
+              </div>
+              <div className="product-card-d6">
+                <Link to='/products'>
+                  <img src={freshFruits} alt="Fresh Fruits" className="product-image-d6" />
+                  <h3 className="product-title-d6">Fresh Fruits</h3>
+                  <p className="product-price-d6">₹149/kg</p>
+                  <button className="view-details-button-d6">View Details</button>
+                </Link>
+              </div>
+              <div className="product-card-d6">
+                <Link to='/products'>
+                  <img src={pureHoney} alt="Pure Honey" className="product-image-d6" />
+                  <h3 className="product-title-d6">Pure Honey</h3>
+                  <p className="product-price-d6">₹399/500g</p>
+                  <button className="view-details-button-d6">View Details</button>
+                </Link>
+              </div>
+              <div className="product-card-d6">
+                <Link to='/products'>
+                  <img src={organicGrains} alt="Organic Grains" className="product-image-d6" />
+                  <h3 className="product-title-d6">Organic Grains</h3>
+                  <p className="product-price-d6">₹299/kg</p>
+                  <button className="view-details-button-d6">View Details</button>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Recommended Farmers Section */}
+          <div className="recommended-farmers-d6">
+            <h2 className="section-title-d6">Recommended Farmers</h2>
+            <div className="farmers-d6">
+              <div className="farmer-card-d6">
+                <img src={rajeshKumar} alt="Rajesh Kumar" className="farmer-image-d6" />
+                <div className="farmer-info-d6">
+                  <h3 className="farmer-name-d6">Rajesh Kumar</h3>
+                  <p className="farmer-type-d6">Organic Farming</p>
+                  {renderStars(4)} {/* Example rating of 4 out of 5 */}
+                </div>
+                <MdVerifiedUser className="verified-icon-d6" />
+              </div>
+              <div className="farmer-card-d6">
+                <img src={priyaSingh} alt="Priya Singh" className="farmer-image-d6" />
+                <div className="farmer-info-d6">
+                  <h3 className="farmer-name-d6">Priya Singh</h3>
+                  <p className="farmer-type-d6">Natural Farming</p>
+                  {renderStars(3)} {/* Example rating of 3 out of 5 */}
+                </div>
+                <MdVerifiedUser className="verified-icon-d6" />
+              </div>
+              <div className="farmer-card-d6">
+                <img src={amitPatel} alt="Amit Patel" className="farmer-image-d6" />
+                <div className="farmer-info-d6">
+                  <h3 className="farmer-name-d6">Amit Patel</h3>
+                  <p className="farmer-type-d6">Sustainable Farming</p>
+                  {renderStars(5)} {/* Example rating of 5 out of 5 */}
+                </div>
+                <MdVerifiedUser className="verified-icon-d6" />
+              </div>
+            </div>
+          </div>
+
+          {/* How It Works Section */}
+          <div className="how-it-works-d6">
+            <h2 className="section-title-d6">How It Works</h2>
+            <div className="works-container-d6">
+              <div className="works-column-d6">
+                <h3 className="column-title-d6">For Farmers</h3>
+                <div className="works-step-d6">
+                  <FaUserPlus className="step-icon-d6" />
+                  <div className="step-line-d6"></div>
+                  <FaCheck className="step-icon-d6" />
+                  <div className="step-line-d6"></div>
+                  <FaStore className="step-icon-d6" />
+                </div>
+                <p className="works-description-d6">Register → Get Verified → List Products</p>
+              </div>
+              <div className="works-column-d6">
+                <h3 className="column-title-d6">For Consumers</h3>
+                <div className="works-step-d6">
+                  <FaSearch className="step-icon-d6" />
+                  <div className="step-line-d6"></div>
+                  <IoDocumentTextOutline className="step-icon-d6" />
+                  <div className="step-line-d6"></div>
+                  <FaShoppingCart className="step-icon-d6" />
+                </div>
+                <p className="works-description-d6">Browse → Verify Seller → Buy</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Customer Testimonials Section */}
+          <div className="testimonials-d6">
+            <h2 className="section-title-d6">Customer Testimonials</h2>
+            <div className="testimonials-container-d6">
+              <div className="testimonial-card-d6">
                 {renderStars(4)} {/* Example rating of 4 out of 5 */}
+                <p className="testimonial-text-d6">
+                  "Amazing quality products directly from farmers. The transparency in the system is commendable."
+                </p>
+                <div className="customer-info-d6">
+                  <img src={rajeshKumar} alt="Sarah Johnson" className="customer-image-d6" />
+                  <div className="customer-details-d6">
+                    <h3 className="customer-name-d6">Sarah Johnson</h3>
+                    <p className="customer-role-d6">Regular Customer</p>
+                  </div>
+                </div>
               </div>
-              <MdVerifiedUser className="verified-icon" />
-            </div>
-            <div className="farmer-card">
-              <img src={priyaSingh} alt="Priya Singh" className="farmer-image" />
-              <div className="farmer-info">
-                <h3 className="farmer-name">Priya Singh</h3>
-                <p className="farmer-type">Natural Farming</p>
+              <div className="testimonial-card-d6">
                 {renderStars(3.5)} {/* Example rating of 3.5 out of 5 */}
-              </div>
-              <MdVerifiedUser className="verified-icon" />
-            </div>
-            <div className="farmer-card">
-              <img src={amitPatel} alt="Amit Patel" className="farmer-image" />
-              <div className="farmer-info">
-                <h3 className="farmer-name">Amit Patel</h3>
-                <p className="farmer-type">Sustainable Farming</p>
-                {renderStars(5)} {/* Example rating of 5 out of 5 */}
-              </div>
-              <MdVerifiedUser className="verified-icon" />
-            </div>
-          </div>
-        </div>
-
-        {/* How It Works Section */}
-        <div className="how-it-works">
-          <h2 className="section-title">How It Works</h2>
-          <div className="works-container">
-            <div className="works-column">
-              <h3 className="column-title">For Farmers</h3>
-              <div className="works-step">
-                <FaUserPlus className="step-icon" />
-                <div className="step-line"></div>
-                <FaCheck className="step-icon" />
-                <div className="step-line"></div>
-                <FaStore className="step-icon" />
-              </div>
-              <p className="works-description">Register → Get Verified → List Products</p>
-            </div>
-            <div className="works-column">
-              <h3 className="column-title">For Consumers</h3>
-              <div className="works-step">
-                <FaSearch className="step-icon" />
-                <div className="step-line"></div>
-                <IoDocumentTextOutline className="step-icon" />
-                <div className="step-line"></div>
-                <FaShoppingCart className="step-icon" />
-              </div>
-              <p className="works-description">Browse → Verify Seller → Buy</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Customer Testimonials Section */}
-        <div className="testimonials">
-          <h2 className="section-title">Customer Testimonials</h2>
-          <div className="testimonials-container">
-            <div className="testimonial-card">
-              {renderStars(4)} {/* Example rating of 4 out of 5 */}
-              <p className="testimonial-text">
-                "Amazing quality products directly from farmers. The transparency in the system is commendable."
-              </p>
-              <div className="customer-info">
-                <img src={rajeshKumar} alt="Sarah Johnson" className="customer-image" />
-                <div className="customer-details">
-                  <h3 className="customer-name">Sarah Johnson</h3>
-                  <p className="customer-role">Regular Customer</p>
+                <p className="testimonial-text-d6">
+                  "The verification process gives me confidence in the authenticity of the products."
+                </p>
+                <div className="customer-info-d6">
+                  <img src={priyaSingh} alt="Michael Chen" className="customer-image-d6" />
+                  <div className="customer-details-d6">
+                    <h3 className="customer-name-d6">Michael Chen</h3>
+                    <p className="customer-role-d6">Verified Buyer</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="testimonial-card">
-              {renderStars(3.5)} {/* Example rating of 3.5 out of 5 */}
-              <p className="testimonial-text">
-                "The verification process gives me confidence in the authenticity of the products."
-              </p>
-              <div className="customer-info">
-                <img src={priyaSingh} alt="Michael Chen" className="customer-image" />
-                <div className="customer-details">
-                  <h3 className="customer-name">Michael Chen</h3>
-                  <p className="customer-role">Verified Buyer</p>
-                </div>
-              </div>
-            </div>
-            <div className="testimonial-card">
-              {renderStars(5)} 
-              <p className="testimonial-text">
-                "Fresh products and excellent customer service. Will definitely recommend!"
-              </p>
-              <div className="customer-info">
-                <img src={amitPatel} alt="Emma Wilson" className="customer-image" />
-                <div className="customer-details">
-                  <h3 className="customer-name">Emma Wilson</h3>
-                  <p className="customer-role">Happy Customer</p>
+              <div className="testimonial-card-d6">
+                {renderStars(5)} 
+                <p className="testimonial-text-d6">
+                  "Fresh products and excellent customer service. Will definitely recommend!"
+                </p>
+                <div className="customer-info-d6">
+                  <img src={amitPatel} alt="Emma Wilson" className="customer-image-d6" />
+                  <div className="customer-details-d6">
+                    <h3 className="customer-name-d6">Emma Wilson</h3>
+                    <p className="customer-role-d6">Happy Customer</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Join Our Growing Community Section */}
-        <div className="community-section">
-          <h2 className="community-title">Join Our Growing Community</h2>
-          <div className="community-buttons">
-            <button className="community-button">Join Us</button>
+          {/* Join Our Growing Community Section */}
+          <div className="community-section-d6">
+            <h2 className="community-title-d6">Join Our Growing Community</h2>
+            <div className="community-buttons-d6">
+              <button className="community-button-d6">Join Us</button>
+            </div>
           </div>
         </div>
+        {/* Footer Section */}
+        
       </div>
-      {/* Footer Section */}
-      
-    </div>
-  );
-};
+    );
+  };
 
-export default LandingPage;
+  export default LandingPage;

@@ -1,58 +1,101 @@
-
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './SingleProduct.css';
-import ta1 from '../../assets/tomato1.png';
-import ta2 from '../../assets/tomato2.png';
-import ta3 from '../../assets/tomato3.png';
-import ta4 from '../../assets/tomato4.png';
-import ta5 from '../../assets/tomato5.png';
-import rajesh from '../../assets/rajesh.jpg';
-import riya from '../../assets/priya-singh.jpg';
-import potato from '../../assets/potato.jpg';
-import { FaFlag } from "react-icons/fa6";
-import { FaFileAlt } from "react-icons/fa";
+import { FaFlag, FaFileAlt } from 'react-icons/fa';
+import { MdVerifiedUser } from "react-icons/md";
+import { getProductById, getAllProducts } from '../Api';
+import { Link } from 'react-router-dom';
 
 const ProductPage = () => {
+  const { productId } = useParams(); // Get productId from URL
   const [selectedImage, setSelectedImage] = useState(0);
   const [rating, setRating] = useState(0);
-  
-  // Product images
-  const mainImage = ta1 ;
-  const thumbnails = [
-    ta2,
-    ta3,
-    ta4,
-    ta5,
-    
-  ];
-  
-  // Related products
-  const relatedProducts = [
-    {
-      id: 1,
-      name: 'Organic Potatoes',
-      price: '₹289/kg',
-      image: potato
+  const [product, setProduct] = useState(null); // Current product
+  const [relatedProducts, setRelatedProducts] = useState([]); // Related products
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [certificateUrl, setCertificateUrl] = useState(null);
+
+  // Fetch product details and related products when component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch the current product
+        const productData = await getProductById(productId);
+        const currentProduct = productData.product;
+        setProduct(currentProduct);
+
+        // Fetch all products to find related ones
+        const allProductsData = await getAllProducts();
+        const allProducts = allProductsData.products.map((prod) => ({
+          id: prod.id,
+          name: prod.name,
+          price: prod.mrpPerKg,
+          image: prod.images[0],
+          category: prod.category.charAt(0).toUpperCase() + prod.category.slice(1)
+        }));
+
+        // Filter related products: same category, exclude current product, limit to 5
+        const related = allProducts
+          .filter(
+            (prod) =>
+              prod.category === (currentProduct.category.charAt(0).toUpperCase() + currentProduct.category.slice(1)) &&
+              prod.id !== currentProduct.id
+          )
+          .slice(0, 5); // Take first 5
+
+        setRelatedProducts(related);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to load product details or related products.');
+        setLoading(false);
+      }
+    };
+
+    if (productId) {
+      fetchData();
+    } else {
+      setError('No product ID provided.');
+      setLoading(false);
     }
-  ];
-  
-  // Reviews
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [productId]);
+
+  const handleThumbnailClick = (index) => {
+    setSelectedImage(index);
+  };
+
+  const handleRatingClick = (value) => {
+    setRating(value);
+  };
+
+  if (loading) {
+    return <div>Loading product details...</div>;
+  }
+
+  if (error || !product) {
+    return <div>{error || 'Product not found.'}</div>;
+  }
+
+  const mainImage = product.images[selectedImage] || product.images[0];
+  const thumbnails = product.images || [];
+
+  // Static reviews (could be fetched separately if API provides)
   const reviews = [
     {
       id: 1,
       name: 'Riya Sharma',
       rating: 5,
-      comment: 'Excellent quality tomatoes! Very fresh and tasty. Will definitely buy again.'
+      comment: 'Excellent quality! Very fresh and tasty. Will definitely buy again.'
     }
   ];
-  
-  const handleThumbnailClick = (index) => {
-    setSelectedImage(index);
+
+  const handleCertificateClick = (url) => {
+    setCertificateUrl(url); // Set the URL to display in iframe
   };
-  
-  const handleRatingClick = (value) => {
-    setRating(value);
+
+  const closeIframe = () => {
+    setCertificateUrl(null); // Clear URL to hide iframe
   };
 
   return (
@@ -60,87 +103,117 @@ const ProductPage = () => {
       <div className="product-main-section">
         <div className="product-image-section">
           <div className="main-image-container">
-            <img src={mainImage} alt="Organic Farm-Fresh Tomatoes" className="main-image" />
+            <img src={mainImage} alt={product.name} className="main-image" />
           </div>
           <div className="thumbnails-container">
             {thumbnails.map((thumb, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`thumbnail ${selectedImage === index ? 'active-thumbnail' : ''}`}
                 onClick={() => handleThumbnailClick(index)}
               >
-                <img src={thumb} alt={`Tomato thumbnail ${index + 1}`} />
+                <img src={thumb} alt={`${product.name} thumbnail ${index + 1}`} />
               </div>
             ))}
           </div>
         </div>
-        
+
         <div className="product-info-section">
-          <h1 className="product-title">Organic Farm-Fresh Tomatoes</h1>
-          <p className="product-description">
-            Premium-quality, locally grown organic tomatoes. Harvested daily for maximum freshness and taste.
-          </p>
-          
-          <div className="product-price2">₹499/kg</div>
-          
+          <h1 className="product-title">{product.name}</h1>
+          <p className="product-description">{product.description || 'No description available.'}</p>
+
+          <div className="product-price2">₹{product.mrpPerKg}/kg</div>
+
           <div className="farmer-d">
-          {/* <div className="farmer-card"> */}
-<div className="farmer-info2">
-<div className="farmer-avatar2">
-  <img src={rajesh} alt="Rajesh Kumar" />
-</div>
-<div className="farmer-details2">
-  <div className="farmer-name2">
-    <h3>Rajesh Kumar</h3>
-    <span className="verified-badge">✓</span>
-  </div>
-  <p className="farmer-trust2">Trusted by FarmTrust</p>
-  <a href="#" className="view-profile">View Profile</a>
-</div>
-</div>
-<div className="farmer-actions2">
-<a href="#" className="view-certificate"> <span className="file-icon-fa"> <FaFileAlt /> </span>View Certificate</a>
-<button className="report-seller">
-  <span className="report-icon"><FaFlag /></span>
-  Report Seller
-</button>
-</div>
-{/* </div> */}
-</div>
-          
+            <div className="farmer-info2">
+              <div className="farmer-avatar2">
+                <img src={product.farmer.profilePic} alt={product.farmer.name} />
+              </div>
+              <div className="farmer-details2">
+                <div className="farmer-name2">
+                  <h3>{product.farmer.name}</h3>
+                  {product.farmer.isVerified && <MdVerifiedUser color='#28a745' />}
+                </div>
+                <p className="farmer-trust2">Trusted by FarmTrust</p>
+                <Link to={`/farmer/${product.farmer.email}`} className="view-profile">
+                  View Profile
+                </Link>
+              </div>
+            </div>
+            <div className="farmer-actions2">
+              {product.farmer.certificates.fssai && (
+                <button
+                  onClick={() => handleCertificateClick(product.farmer.certificates.fssai)}
+                  className="view-certificate"
+                >
+                  <span className="file-icon-fa"><FaFileAlt /></span>FSSAI Certificate
+                </button>
+              )}
+              {product.farmer.certificates.organicFarm && (
+                <button
+                  onClick={() => handleCertificateClick(product.farmer.certificates.organicFarm)}
+                  className="view-certificate"
+                >
+                  <span className="file-icon-fa"><FaFileAlt /></span>Organic Certificate
+                </button>
+              )}
+              <button className="report-seller">
+                <span className="report-icon"><FaFlag /></span>Report Seller
+              </button>
+            </div>
+            {certificateUrl && (
+              <div className="certificate-iframe-container">
+                <button className="close-iframe" onClick={closeIframe}>Close</button>
+                <iframe
+                  src={certificateUrl}
+                  title="Certificate"
+                  className="certificate-iframe"
+                />
+              </div>
+            )}
+          </div>
+
           <div className="product-actions">
             <button className="buy-now-button">Buy Now</button>
             <button className="add-to-cart-button">Add to Cart</button>
           </div>
         </div>
       </div>
-      
+
+
+
       <div className="related-products-section">
         <h2 className="section-title">Related Products</h2>
         <div className="related-products-container">
-          {relatedProducts.map(product => (
-            <div key={product.id} className="related-product-card">
-              <div className="related-product-image">
-                <img src={product.image} alt={product.name} />
+          {relatedProducts.length > 0 ? (
+            relatedProducts.map((related) => (
+              <div key={related.id} className="related-product-card">
+                <Link to={`/products/${related.id}`}>
+                  <div className="related-product-image">
+                    <img src={related.image} alt={related.name} />
+                  </div>
+                </Link>
+                <div className="related-product-info">
+                  <h3 className="related-product-name">{related.name}</h3>
+                  <div className="related-product-price">₹{related.price}/kg</div>
+                </div>
               </div>
-              <div className="related-product-info">
-                <h3 className="related-product-name">{product.name}</h3>
-                <div className="related-product-price">{product.price}</div>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>No related products available.</p>
+          )}
         </div>
       </div>
-      
+
       <div className="customer-reviews-section">
         <h2 className="section-title">Customer Reviews</h2>
-        
+
         <div className="write-review-container">
           <div className="write-review-header">Write a Review</div>
           <div className="rating-stars">
-            {[1, 2, 3, 4, 5].map(star => (
-              <span 
-                key={star} 
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
                 className={`star ${rating >= star ? 'filled' : ''}`}
                 onClick={() => handleRatingClick(star)}
               >
@@ -148,25 +221,22 @@ const ProductPage = () => {
               </span>
             ))}
           </div>
-          <textarea 
-            className="review-input" 
-            placeholder="Share your experience..."
-          ></textarea>
+          <textarea className="review-input" placeholder="Share your experience..."></textarea>
           <button className="submit-review-button">Submit Review</button>
         </div>
-        
+
         <div className="reviews-list">
-          {reviews.map(review => (
+          {reviews.map((review) => (
             <div key={review.id} className="review-card">
               <div className="reviewer-avatar">
-                <img src={riya} alt={review.name} />
+                <img src="https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg" alt={review.name} />
               </div>
               <div className="review-content">
                 <div className="reviewer-name">{review.name}</div>
                 <div className="review-rating">
                   {[...Array(5)].map((_, i) => (
                     <span key={i} className={`star ${i < review.rating ? 'filled' : ''}`}>★</span>
-                  ))}
+                  ))} <span style={{ color: "black" }}>3.5/5</span>
                 </div>
                 <div className="review-text">{review.comment}</div>
               </div>
@@ -179,4 +249,3 @@ const ProductPage = () => {
 };
 
 export default ProductPage;
-

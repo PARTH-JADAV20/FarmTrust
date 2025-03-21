@@ -6,9 +6,10 @@ import ProductList from './components/Product/ProductList';
 import SingleProduct from './components/SingleProduct/SIngleProduct';
 import FarmerApplyForm from './components/FarmerApplyForm/FarmerApplyForm';
 import LandingPage from './components/LandingPage/LandingPage';
-import UserPrfoile from './components/UserProfile/UserProfile';
+import UserDashboard from './components/UserDashboard';
 import Farmer from './components/Farmer';
-
+import UserOrders from './components/UserOrders/UserOrders';
+import UserCart from './components/UserCart/UserCart';
 function App() {
   return (
     <Router>
@@ -27,10 +28,12 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/products" element={<ProductList />} />
-        <Route path='/product' element={<SingleProduct />} />
+        <Route path="/products/:productId" element={<SingleProduct />} />
         <Route path='/farmer-application' element={<FarmerApplyForm />} />
-        <Route path="/farmer" element={<FarmerProfile />} />
-        <Route path="/user" element={<UserPrfoile />} />
+        <Route path="/farmer/:email" element={<FarmerProfile />} />
+        <Route path="/user/*" element={<UserDashboard />} />
+        <Route path="/user/orders" element={<UserOrders />} />
+        <Route path="/user/cart" element={<UserCart/>} />
         <Route path="/farmerpanel/*" element={<Farmer />} />
       </Routes>
         <Footer />

@@ -7,10 +7,24 @@ const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const Farmer = require('./models/farmer');
 const User = require('./models/user');
+const http = require('http');
+const { Server } = require('socket.io');
+const Chat = require('./models/chat');
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true,
+  },
+  transports: ['websocket', 'polling'],
+});
+
 const PORT = 5000;
 
 mongoose
@@ -31,16 +45,20 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST'],
+  credentials: true,
+}));
 app.use(express.json());
 
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    if (file.fieldname === 'productImages') {
+    if (file.fieldname === 'productImages' || file.fieldname === 'profilePic') {
       if (!file.mimetype.startsWith('image/')) {
-        return cb(new Error('Product images must be image files'));
+        return cb(new Error('Product images and profile picture must be image files'));
       }
     } else if (file.fieldname === 'fssaiCert' || file.fieldname === 'organicCert') {
       if (file.mimetype !== 'application/pdf') {
@@ -49,10 +67,10 @@ const upload = multer({
     }
     cb(null, true);
   },
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit per file
+  limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-app.post('/farmers', async (req, res) => {
+app.post('/farmers', upload.single('profilePic'), async (req, res) => {
   try {
     const { name, email } = req.body;
 
@@ -60,10 +78,25 @@ app.post('/farmers', async (req, res) => {
       return res.status(400).json({ message: 'Name and email are required' });
     }
 
+    let profilePicUrl = '';
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: 'farmers/profile_pics', resource_type: 'image' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(req.file.buffer);
+      });
+      profilePicUrl = result.secure_url;
+    }
+
     const farmerData = {
       _id: new ObjectId().toString(),
       name,
       email,
+      profilePic: profilePicUrl || 'https://us.123rf.com/450wm/glebdesign159/glebdesign1592409/glebdesign159240900440/235164018-cartoon-vector-illustration-of-farmer.jpg?ver=6'
     };
 
     const farmer = new Farmer(farmerData);
@@ -74,7 +107,6 @@ app.post('/farmers', async (req, res) => {
       farmerId: farmer._id
     });
   } catch (error) {
-    console.error('Error creating farmer:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -82,14 +114,12 @@ app.post('/farmers', async (req, res) => {
 app.patch('/farmers/:id', upload.fields([
   { name: 'productImages', maxCount: 4 },
   { name: 'fssaiCert', maxCount: 1 },
-  { name: 'organicCert', maxCount: 1 }
+  { name: 'organicCert', maxCount: 1 },
+  { name: 'profilePic', maxCount: 1 }
 ]), async (req, res) => {
   try {
     const { id } = req.params;
-    const { phone, address, description, deliveryCharge, products } = req.body;
-
-    console.log('Request body:', req.body); 
-    console.log('Uploaded files:', req.files); 
+    const { phone, address, description, deliveryCharge, products, showPhoneToUsers } = req.body;
 
     const farmer = await Farmer.findById(id);
     if (!farmer) {
@@ -100,42 +130,44 @@ app.patch('/farmers/:id', upload.fields([
     if (address) farmer.address = JSON.parse(address);
     if (description) farmer.description = description;
     if (deliveryCharge) farmer.deliveryCharge = deliveryCharge;
+    if (showPhoneToUsers !== undefined) farmer.showPhoneToUsers = showPhoneToUsers === 'true' || showPhoneToUsers === true;
 
-    // Upload product images to Cloudinary
+    if (req.files['profilePic']) {
+      const profilePicFile = req.files['profilePic'][0];
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: 'farmers/profile_pics', resource_type: 'image' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(profilePicFile.buffer);
+      });
+      farmer.profilePic = result.secure_url;
+      console.log('Updated Profile Pic URL:', result.secure_url);
+    }
+
     const productImages = [];
     if (req.files['productImages']) {
       for (const file of req.files['productImages']) {
-        console.log('Uploading file:', file.originalname, file.mimetype, file.buffer.length); 
         const result = await new Promise((resolve, reject) => {
           cloudinary.uploader.upload_stream(
             { folder: 'farmers/products', resource_type: 'image' },
             (error, result) => {
-              if (error) {
-                console.error('Cloudinary upload error:', error);
-                reject(error);
-              } else {
-                console.log('Upload result:', result); 
-                resolve(result);
-              }
+              if (error) reject(error);
+              else resolve(result);
             }
           ).end(file.buffer);
         });
         productImages.push(result.secure_url);
       }
-    } else {
-      console.log('No product images uploaded');
     }
 
-    // Upload certificates to Cloudinary
     if (req.files['fssaiCert']) {
       const fssaiFile = req.files['fssaiCert'][0];
       const fssaiResult = await new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(
-          {
-            folder: 'farmers/certificates',
-            resource_type: 'raw',
-            public_id: `${Date.now()}-${fssaiFile.originalname}` 
-          },
+          { folder: 'farmers/certificates', resource_type: 'raw', public_id: `${Date.now()}-${fssaiFile.originalname}` },
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
@@ -143,18 +175,13 @@ app.patch('/farmers/:id', upload.fields([
         ).end(fssaiFile.buffer);
       });
       farmer.certificates.fssai = fssaiResult.secure_url;
-      console.log('FSSAI URL:', fssaiResult.secure_url);
     }
 
     if (req.files['organicCert']) {
       const organicFile = req.files['organicCert'][0];
       const organicResult = await new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(
-          {
-            folder: 'farmers/certificates',
-            resource_type: 'raw',
-            public_id: `${Date.now()}-${organicFile.originalname}`
-          },
+          { folder: 'farmers/certificates', resource_type: 'raw', public_id: `${Date.now()}-${organicFile.originalname}` },
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
@@ -162,30 +189,24 @@ app.patch('/farmers/:id', upload.fields([
         ).end(organicFile.buffer);
       });
       farmer.certificates.organicFarm = organicResult.secure_url;
-      console.log('Organic URL:', organicResult.secure_url);
     }
 
     if (products) {
       const parsedProducts = JSON.parse(products);
-      const newProducts = parsedProducts.map(product => {
-        const productId = new ObjectId().toString();
-        console.log('New Product id:', productId);
-        return {
-          id: productId,
-          name: product.name,
-          mrpPerKg: product.mrpPerKg,
-          images: productImages.length ? productImages : [], 
-          description: product.description || '', 
-          category: product.category,
-          subcategory: product.subcategory,
-          stockInKg: product.stockInKg,
-        };
-      });
+      const newProducts = parsedProducts.map(product => ({
+        id: new ObjectId().toString(),
+        name: product.name,
+        mrpPerKg: product.mrpPerKg,
+        images: productImages.length ? productImages : [],
+        description: product.description || '',
+        category: product.category,
+        subcategory: product.subcategory,
+        stockInKg: product.stockInKg,
+      }));
       farmer.products.push(...newProducts);
     }
 
     await farmer.save();
-    console.log('Updated farmer products:', farmer.products);
 
     res.status(200).json({
       message: 'Farmer updated successfully',
@@ -193,6 +214,65 @@ app.patch('/farmers/:id', upload.fields([
     });
   } catch (error) {
     console.error('Error updating farmer:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.get('/farmers/products', async (req, res) => {
+  try {
+    const farmers = await Farmer.find({}, 'products');
+    const allProducts = farmers.flatMap(farmer => farmer.products);
+
+    res.status(200).json({
+      message: 'All products retrieved successfully',
+      products: allProducts
+    });
+  } catch (error) {
+    console.error('Error fetching all products:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.get('/farmers/products/:productId', async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const farmer = await Farmer.findOne(
+      { "products.id": productId },
+      {
+        "products.$": 1,
+        name: 1,
+        email: 1,
+        profilePic: 1,
+        isVerified: 1,
+        "certificates.fssai": 1,
+        "certificates.organicFarm": 1
+      }
+    );
+
+    if (!farmer || !farmer.products.length) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const product = farmer.products[0];
+    res.status(200).json({
+      message: 'Product retrieved successfully',
+      product: {
+        ...product._doc,
+        farmer: {
+          email: farmer.email,
+          name: farmer.name,
+          profilePic: farmer.profilePic,
+          isVerified: farmer.isVerified,
+          certificates: {
+            fssai: farmer.certificates.fssai || '',
+            organicFarm: farmer.certificates.organicFarm || ''
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching product by ID:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -245,7 +325,7 @@ app.delete('/farmers/:id/products/:productId', async (req, res) => {
 
 app.post('/users', async (req, res) => {
   try {
-    const { name, email, phone, address, role } = req.body; 
+    const { name, email, phone, address, role } = req.body;
 
     if (!name || !email) {
       return res.status(400).json({ message: 'Name and email are required' });
@@ -262,7 +342,7 @@ app.post('/users', async (req, res) => {
       email,
       phone: phone || '',
       address: address || { street: '', city: '', state: '', zipCode: '' },
-      role: role || 'customer' 
+      role: role || 'customer'
     };
 
     const user = new User(userData);
@@ -281,7 +361,7 @@ app.post('/users', async (req, res) => {
 app.patch('/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, googleId, phone, address, cart, orders, role } = req.body; 
+    const { name, email, phone, address, cart, orders, role } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
@@ -298,7 +378,7 @@ app.patch('/users/:id', async (req, res) => {
     }
     if (phone) user.phone = phone;
     if (address) user.address = JSON.parse(address);
-    if (role) user.role = role; 
+    if (role) user.role = role;
 
     if (cart) {
       const parsedCart = JSON.parse(cart);
@@ -306,8 +386,7 @@ app.patch('/users/:id', async (req, res) => {
     }
 
     if (orders) {
-      const parsedOrders = JSON.parse(orders);
-      const newOrders = parsedOrders.map(order => ({
+      const newOrders = orders.map(order => ({
         id: new ObjectId().toString(),
         farmerId: order.farmerId,
         products: order.products.map(product => ({
@@ -381,6 +460,184 @@ app.delete('/users/:id/cart/:productId', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.get('/orders', async (req, res) => {
+  try {
+    const users = await User.find({}, { orders: 1, name: 1, phone: 1, address: 1, _id: 0 });
+
+    const allOrders = users.reduce((acc, user) => {
+      const userOrders = user.orders.map(order => ({
+        ...order.toObject(),
+        userName: user.name,
+        userPhone: user.phone || 'Not provided',
+        userAddress: `${user.address.street}, ${user.address.city}, ${user.address.state} ${user.address.zipCode}`.trim().replace(/\s*,\s*/g, ', ') || 'Not provided'
+      }));
+      return acc.concat(userOrders);
+    }, []);
+
+    res.status(200).json({
+      message: 'All orders retrieved successfully',
+      orders: allOrders
+    });
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Socket.IO Connection
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('joinChat', ({ userEmail, farmerEmail }, callback) => {
+    const normalizedUserEmail = userEmail.toLowerCase();
+    const normalizedFarmerEmail = farmerEmail.toLowerCase();
+    const room = `${normalizedUserEmail}_${normalizedFarmerEmail}`;
+    socket.join(room);
+    console.log(`Joined room: ${room}`);
+    if (callback) callback({ status: 'Joined room successfully' });
+  });
+
+  socket.on('sendMessage', async (message, callback) => {
+    try {
+      const { senderType, senderEmail, receiverType, receiverEmail, content } = message;
+      console.log('Received message:', message);
+
+      if (!senderType || !senderEmail || !receiverType || !receiverEmail || !content) {
+        throw new Error('Invalid message data: Missing required fields');
+      }
+
+      const userEmail = senderType === 'customer' ? senderEmail : receiverEmail;
+      const farmerEmail = senderType === 'farmer' ? senderEmail : receiverEmail;
+
+      const newMessage = {
+        sender: {
+          type: senderType,
+          email: senderEmail,
+        },
+        receiverEmail, // Add receiverEmail for client-side room computation
+        content,
+        createdAt: new Date(),
+        isRead: false,
+      };
+
+      console.log('Updating chat for:', { userEmail, farmerEmail });
+      let chat = await Chat.findOneAndUpdate(
+        {
+          'participants.userEmail': { $regex: new RegExp(`^${userEmail}$`, 'i') },
+          'participants.farmerEmail': { $regex: new RegExp(`^${farmerEmail}$`, 'i') },
+        },
+        {
+          $push: { messages: newMessage },
+          $set: { lastMessageAt: new Date() },
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+
+      console.log('Chat updated:', chat);
+
+      const normalizedUserEmail = userEmail.toLowerCase();
+      const normalizedFarmerEmail = farmerEmail.toLowerCase();
+      const room = `${normalizedUserEmail}_${normalizedFarmerEmail}`;
+      console.log('Emitting message to room:', room);
+      console.log('Message being emitted:', newMessage);
+      io.to(room).emit('receiveMessage', newMessage);
+
+      if (callback) callback({ status: 'Message sent successfully' });
+    } catch (error) {
+      console.error('Error saving message:', error.message, error.stack);
+      if (callback) callback({ error: 'Failed to send message', details: error.message });
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+// Routes
+app.get('/chat/conversations/customer/:userEmail', async (req, res) => {
+  try {
+    const chats = await Chat.find({ 'participants.userEmail': req.params.userEmail })
+      .sort({ lastMessageAt: -1 });
+    const chatData = await Promise.all(chats.map(async (chat) => {
+      const farmer = await Farmer.findOne({ email: chat.participants.farmerEmail }, 'name');
+      return {
+        userEmail: chat.participants.userEmail,
+        farmerEmail: chat.participants.farmerEmail,
+        farmerName: farmer ? farmer.name : 'Unknown Farmer',
+        lastMessage: chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : null,
+        lastMessageAt: chat.lastMessageAt,
+      };
+    }));
+    res.json(chatData);
+  } catch (error) {
+    console.error('Error fetching customer conversations:', error);
+    res.status(500).json({ error: 'Failed to fetch conversations' });
+  }
+});
+
+app.get('/chat/conversations/farmer/:farmerEmail', async (req, res) => {
+  try {
+    const farmerEmail = req.params.farmerEmail;
+    console.log('Fetching chats for farmer:', farmerEmail);
+    const chats = await Chat.find({
+      'participants.farmerEmail': { $regex: new RegExp(`^${farmerEmail}$`, 'i') },
+    }).sort({ lastMessageAt: -1 });
+
+    console.log('Found chats:', chats);
+
+    const chatData = await Promise.all(chats.map(async (chat) => {
+      const user = await User.findOne({ email: chat.participants.userEmail }, 'name');
+      return {
+        userEmail: chat.participants.userEmail,
+        farmerEmail: chat.participants.farmerEmail,
+        userName: user ? user.name : chat.participants.userEmail,
+        lastMessage: chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : null,
+        lastMessageAt: chat.lastMessageAt,
+      };
+    }));
+
+    res.json(chatData);
+  } catch (error) {
+    console.error('Error fetching farmer conversations:', error);
+    res.status(500).json({ error: 'Failed to fetch conversations' });
+  }
+});
+
+app.get('/chat/history', async (req, res) => {
+  const { userEmail, farmerEmail } = req.query;
+  try {
+    const chat = await Chat.findOne({
+      'participants.userEmail': userEmail,
+      'participants.farmerEmail': farmerEmail,
+    });
+    if (!chat) {
+      return res.json([]);
+    }
+    res.json(chat.messages);
+  } catch (error) {
+    console.error('Error fetching chat history:', error);
+    res.status(500).json({ error: 'Failed to fetch chat history' });
+  }
+});
+
+app.get('/api/farmer/:email', async (req, res) => {
+  const { email } = req.params;
+  try {
+    const farmer = await Farmer.findOne({ email }, 'name email');
+    if (!farmer) {
+      return res.status(404).json({ error: 'Farmer not found' });
+    }
+    res.json({ email: farmer.email, name: farmer.name });
+  } catch (error) {
+    console.error('Error fetching farmer:', error);
+    res.status(500).json({ error: 'Failed to fetch farmer' });
+  }
+});
+
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

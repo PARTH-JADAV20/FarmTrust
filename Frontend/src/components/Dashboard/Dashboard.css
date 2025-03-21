@@ -8,6 +8,10 @@
   margin-bottom: 30px;
 }
 
+.da-dashboard{
+  padding: 20px 30px;
+}
+
 .da-welcome-message h1 {
   font-size: 24px;
   font-weight: 600;
@@ -252,7 +256,6 @@
 /* Main Content Styles */
 .da-main-content {
   flex: 1;
-  padding: 20px 30px;
   background-color: #f8f9fa;
   min-height: 100vh;
 }
